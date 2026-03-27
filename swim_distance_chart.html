@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swimming Metrics — 90 Days</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #ffffff;
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  .card {
+    background: #ffffff;
+    border: 1px solid #e0e6ed;
+    border-radius: 4px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 920px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+  }
+
+  .eyebrow {
+    font-size: 0.6rem;
+    letter-spacing: 0.22em;
+    color: #1a6fcc;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: 0.04em;
+    color: #111827;
+    line-height: 1;
+  }
+
+  /* Toggle */
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 0.55rem;
+  }
+
+  .toggle-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    transition: color 0.2s;
+    user-select: none;
+  }
+
+  .toggle-label.active {
+    color: #1a6fcc;
+    font-weight: 500;
+  }
+
+  .toggle {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: #e5e7eb;
+    border-radius: 20px;
+    transition: background 0.22s;
+  }
+
+  .toggle input:checked + .toggle-track {
+    background: #1a6fcc;
+  }
+
+  .toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+    transition: transform 0.22s;
+    pointer-events: none;
+  }
+
+  .toggle input:checked ~ .toggle-thumb {
+    transform: translateX(16px);
+  }
+
+  .date-range {
+    font-size: 0.62rem;
+    color: #9ca3af;
+    margin-top: 0.45rem;
+    letter-spacing: 0.1em;
+  }
+
+  .stats {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-end;
+  }
+
+  .stat { text-align: right; }
+
+  .stat-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.9rem;
+    color: #1a6fcc;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.52rem;
+    color: #9ca3af;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .chart-wrap {
+    position: relative;
+    height: 360px;
+  }
+
+  /* Records section */
+  .records {
+    margin-top: 1.4rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid #f0f4f8;
+  }
+
+  .records-eyebrow {
+    font-size: 0.52rem;
+    letter-spacing: 0.22em;
+    color: #9ca3af;
+    text-transform: uppercase;
+    margin-bottom: 0.9rem;
+  }
+
+  .records-grid {
+    display: flex;
+    gap: 2.5rem;
+  }
+
+  .record-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .record-title {
+    font-size: 0.52rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 0.25rem;
+  }
+
+  .record-primary {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.9rem;
+    color: #111827;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .record-secondary {
+    font-size: 0.58rem;
+    color: #6b7280;
+    letter-spacing: 0.1em;
+    margin-top: 0.2rem;
+  }
+
+  .record-divider {
+    width: 1px;
+    background: #f0f4f8;
+    align-self: stretch;
+    margin: 0 0.5rem;
+  }
+
+  .footer {
+    margin-top: 1.4rem;
+    font-size: 0.5rem;
+    color: #d1d5db;
+    letter-spacing: 0.14em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div>
+      <div class="eyebrow">Pool Swim · Apple Watch</div>
+      <h1>Swimming Metrics</h1>
+
+      <!-- Toggle: Meters / Laps -->
+      <div class="toggle-wrap">
+        <span class="toggle-label active" id="labelMeters">Meters</span>
+        <label class="toggle">
+          <input type="checkbox" id="unitToggle">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+        <span class="toggle-label" id="labelLaps">Laps</span>
+      </div>
+
+      <div class="date-range">DEC 27, 2025 → MAR 27, 2026 &nbsp;·&nbsp; 90 DAYS &nbsp;·&nbsp; <span id="unitLabel">METERS</span></div>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-val" id="totalVal">—</div>
+        <div class="stat-label" id="totalLabel">Total Meters</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="avgVal">—</div>
+        <div class="stat-label" id="avgLabel">Avg / Session</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">17</div>
+        <div class="stat-label">Sessions</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-wrap">
+    <canvas id="swimChart"></canvas>
+  </div>
+
+  <div class="records">
+    <div class="records-eyebrow">Records</div>
+    <div class="records-grid">
+
+      <div class="record-card">
+        <div class="record-title">Longest Swim</div>
+        <div class="record-primary" id="recSwimPrimary">—</div>
+        <div class="record-secondary" id="recSwimSecondary">—</div>
+      </div>
+
+      <div class="record-divider"></div>
+
+      <div class="record-card">
+        <div class="record-title">Longest Session</div>
+        <div class="record-primary" id="recTimePrimary">—</div>
+        <div class="record-secondary" id="recTimeSecondary">—</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="footer">Health Auto Export · Michael's Apple Watch · Pool Swim</div>
+
+<script>
+const METERS_PER_LAP = 25;
+
+// Source: Workouts CSV from Health Auto Export — distances in meters (Apple Health native)
+// Duration format: HH:MM:SS
+const sessions = [
+  { date: '2025-12-29', meters: 1250, duration: '00:37:04' },
+  { date: '2026-01-06', meters: 1300, duration: '00:38:28' },
+  { date: '2026-01-11', meters:  800, duration: '00:25:35' },
+  { date: '2026-01-13', meters: 1000, duration: '00:30:00' },
+  { date: '2026-01-27', meters:  875, duration: '00:30:39' },
+  { date: '2026-01-30', meters: 1000, duration: '00:30:17' },
+  { date: '2026-02-03', meters: 1250, duration: '00:35:21' },
+  { date: '2026-02-05', meters: 1050, duration: '00:33:31' },
+  { date: '2026-02-10', meters: 1150, duration: '00:36:44' },
+  { date: '2026-02-12', meters: 1250, duration: '00:38:18' },
+  { date: '2026-02-19', meters:  650, duration: '00:19:30' },
+  { date: '2026-02-20', meters: 1400, duration: '00:41:22' },
+  { date: '2026-02-24', meters: 1675, duration: '00:47:03' },
+  { date: '2026-03-01', meters:  650, duration: '00:23:38' },
+  { date: '2026-03-10', meters:  675, duration: '00:20:59' },
+  { date: '2026-03-23', meters: 1750, duration: '00:49:44' },
+  { date: '2026-03-27', meters: 1900, duration: '00:58:06' },
+];
+
+const meters = sessions.map(d => d.meters);
+const laps   = meters.map(m => Math.round(m / METERS_PER_LAP));
+
+// Labels
+const labels = sessions.map(d => {
+  const dt = new Date(d.date + 'T12:00:00');
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+});
+
+// Proportional dot sizes (shared — based on meters so they stay consistent)
+const minM = Math.min(...meters);
+const maxM = Math.max(...meters);
+const dotSizes = meters.map(m => {
+  const t = (m - minM) / (maxM - minM);
+  return 1 + t * 3;
+});
+
+// Trend line (least squares) for any value array
+function calcTrend(values) {
+  const n = values.length;
+  const xs = values.map((_, i) => i);
+  const sumX  = xs.reduce((a,b)=>a+b, 0);
+  const sumY  = values.reduce((a,b)=>a+b, 0);
+  const sumXY = xs.reduce((s,x,i)=>s+x*values[i], 0);
+  const sumXX = xs.reduce((s,x)=>s+x*x, 0);
+  const slope     = (n*sumXY - sumX*sumY) / (n*sumXX - sumX*sumX);
+  const intercept = (sumY - slope*sumX) / n;
+  return xs.map(x => Math.round(intercept + slope*x));
+}
+
+const trendMeters = calcTrend(meters);
+const trendLaps   = calcTrend(laps);
+
+// Stats helpers
+function setStats(values, unitShort, totalLabelText, avgLabelText) {
+  const total = values.reduce((a,b)=>a+b, 0);
+  const avg   = Math.round(total / values.length);
+  document.getElementById('totalVal').textContent   = total.toLocaleString();
+  document.getElementById('avgVal').textContent     = avg.toLocaleString();
+  document.getElementById('totalLabel').textContent = totalLabelText;
+  document.getElementById('avgLabel').textContent   = avgLabelText;
+  document.getElementById('unitLabel').textContent  = unitShort;
+}
+
+// Records helpers
+const maxMeters   = Math.max(...meters);
+const maxLaps     = Math.round(maxMeters / METERS_PER_LAP);
+const swimIdx     = meters.indexOf(maxMeters);
+const swimDateFmt = new Date(sessions[swimIdx].date + 'T12:00:00')
+                      .toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+// Longest session by duration
+function durToSec(d) {
+  const [h, m, s] = d.split(':').map(Number);
+  return h * 3600 + m * 60 + s;
+}
+function fmtDur(d) {
+  const [h, m, s] = d.split(':').map(Number);
+  const totalMin = h * 60 + m;
+  return s > 0 ? `${totalMin}:${String(s).padStart(2,'0')}` : `${totalMin}:00`;
+}
+const longestSession = sessions.reduce((best, d) =>
+  durToSec(d.duration) > durToSec(best.duration) ? d : best, sessions[0]);
+const sessionDateFmt = new Date(longestSession.date + 'T12:00:00')
+                         .toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+function setRecords(isLaps) {
+  if (isLaps) {
+    document.getElementById('recSwimPrimary').textContent   = maxLaps.toLocaleString() + ' laps';
+    document.getElementById('recSwimSecondary').textContent = maxMeters.toLocaleString() + ' m · ' + swimDateFmt;
+  } else {
+    document.getElementById('recSwimPrimary').textContent   = maxMeters.toLocaleString() + ' m';
+    document.getElementById('recSwimSecondary').textContent = maxLaps.toLocaleString() + ' laps · ' + swimDateFmt;
+  }
+  document.getElementById('recTimePrimary').textContent   = fmtDur(longestSession.duration) + ' min';
+  document.getElementById('recTimeSecondary').textContent = sessionDateFmt + ' · ' + longestSession.meters.toLocaleString() + ' m';
+}
+
+// Initial stats (meters)
+setStats(meters, 'METERS', 'Total Meters', 'Avg Meters / Session');
+setRecords(false);
+
+// Build chart
+const ctx = document.getElementById('swimChart').getContext('2d');
+
+const chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [
+      {
+        label: 'Distance',
+        data: meters,
+        borderColor: '#1a6fcc',
+        borderWidth: 2.5,
+        pointBackgroundColor: '#e83535',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
+        pointRadius: dotSizes,
+        pointHoverRadius: dotSizes.map(s => s + 3),
+        tension: 0.35,
+        fill: false,
+        order: 2,
+      },
+      {
+        label: 'Trend',
+        data: trendMeters,
+        borderColor: '#f97316',
+        borderWidth: 2,
+        borderDash: [6, 4],
+        pointRadius: 0,
+        tension: 0,
+        fill: false,
+        order: 3,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 600, easing: 'easeOutQuart' },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1e293b',
+        titleColor: '#94a3b8',
+        bodyColor: '#f1f5f9',
+        padding: 12,
+        titleFont: { family: "'DM Mono', monospace", size: 10 },
+        bodyFont: { family: "'DM Mono', monospace", size: 12 },
+        callbacks: {
+          title: items => labels[items[0].dataIndex],
+          label: item => {
+            const isLapsMode = document.getElementById('unitToggle').checked;
+            if (item.dataset.label === 'Trend') {
+              const u = isLapsMode ? 'laps' : 'm';
+              return `  Trend: ${item.parsed.y.toLocaleString()} ${u}`;
+            }
+            const dur = sessions[item.dataIndex].duration;
+            const [h, mn, s] = dur.split(':').map(Number);
+            const totalMin = h * 60 + mn;
+            const durStr = s > 0 ? `${totalMin}:${String(s).padStart(2,'0')} min` : `${totalMin} min`;
+            if (isLapsMode) {
+              return [`  ${item.parsed.y.toLocaleString()} laps`, `  ${durStr}`];
+            } else {
+              return [`  ${item.parsed.y.toLocaleString()} m`, `  ${durStr}`];
+            }
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: '#f0f4f8' },
+        ticks: {
+          color: '#9ca3af',
+          font: { family: "'DM Mono', monospace", size: 9 },
+          maxRotation: 40,
+          minRotation: 30,
+        },
+        border: { color: '#e5e7eb' },
+      },
+      y: {
+        grid: { color: '#f0f4f8' },
+        ticks: {
+          color: '#9ca3af',
+          font: { family: "'DM Mono', monospace", size: 9 },
+          callback: v => v.toLocaleString() + ' m',
+        },
+        border: { color: '#e5e7eb' },
+        min: 0,
+      }
+    }
+  }
+});
+
+// Toggle handler
+document.getElementById('unitToggle').addEventListener('change', function () {
+  const isLaps = this.checked;
+
+  // Swap dataset values & trend
+  chart.data.datasets[0].data = isLaps ? laps : meters;
+  chart.data.datasets[1].data = isLaps ? trendLaps : trendMeters;
+
+  // Y-axis label
+  chart.options.scales.y.ticks.callback = isLaps
+    ? v => v.toLocaleString() + ' laps'
+    : v => v.toLocaleString() + ' m';
+
+  chart.update();
+
+  // Stats + records
+  if (isLaps) {
+    setStats(laps, 'LAPS', 'Total Laps', 'Avg Laps / Session');
+  } else {
+    setStats(meters, 'METERS', 'Total Meters', 'Avg Meters / Session');
+  }
+  setRecords(isLaps);
+
+  // Toggle label colors
+  document.getElementById('labelMeters').classList.toggle('active', !isLaps);
+  document.getElementById('labelLaps').classList.toggle('active', isLaps);
+});
+</script>
+</body>
+</html>
