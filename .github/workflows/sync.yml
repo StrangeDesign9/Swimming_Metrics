@@ -16,7 +16,8 @@ jobs:
 
       - name: Download dashboard from Google Drive
         run: |
-          curl -L "https://drive.google.com/uc?export=download&id=1QOofhfDr49KKoCSP5tadTa4cmfjcXaMV" -o index.html
+          FILE_ID="1ZaC_B1BrRSZw9cI2iFA8ZTuUpOkCf7el"
+          curl -L "https://drive.google.com/uc?export=download&id=${FILE_ID}" -o index.html
           echo "Downloaded $(wc -c < index.html) bytes"
 
       - name: Commit and push if changed
@@ -25,7 +26,7 @@ jobs:
           git config user.email "phelps@swim.local"
           git add index.html
           if git diff --staged --quiet; then
-            echo "No changes"
+            echo "No changes — already current"
           else
             git commit -m "Sync dashboard $(date -u '+%Y-%m-%d %H:%M UTC')"
             git push
