@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -6,597 +7,721 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg:#fff; --panel:#f8fafc; --panel-2:#eef2f7; --ink:#0f172a; --muted:#64748b;
-    --accent:#0284c7; --easy:#4caf50; --mod:#ffb300; --hard:#e53935;
-    --border:#d0d7e2; --danger:#dc2626; --warn:#d97706; --good:#059669;
+    --bg: #ffffff;
+    --panel: #f8fafc;
+    --panel-2: #eef2f7;
+    --ink: #0f172a;
+    --muted: #64748b;
+    --accent: #0284c7;
+    --easy: #4caf50;
+    --mod: #ffb300;
+    --hard: #e53935;
+    --unk: #607d8b;
+    --border: #d0d7e2;
   }
-  *{box-sizing:border-box}
-  body{margin:0;padding:24px;background:var(--bg);color:var(--ink);
-       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Arial,sans-serif}
-  header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px;margin-bottom:20px}
-  h1{margin:0;font-size:22px;letter-spacing:.2px}
-  .meta{color:var(--muted);font-size:13px}
-  .tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:2px solid var(--border)}
-  .tab{padding:10px 20px;background:transparent;border:none;color:var(--muted);
-       font-size:14px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;
-       margin-bottom:-2px;transition:all .15s;font-family:inherit}
-  .tab:hover{color:var(--ink)}
-  .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-  .tab-content{display:none}
-  .tab-content.active{display:block}
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
-  .card .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px}
-  .card .value{font-size:22px;font-weight:600;margin-top:4px}
-  .card .sub{color:var(--muted);font-size:12px;margin-top:2px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
-  .panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
-  .panel h2{margin:0 0 8px 0;font-size:14px;text-transform:uppercase;color:var(--muted);letter-spacing:1px}
-  .chartbox{position:relative;height:280px}
-  .wide{grid-column:1/-1}
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  th,td{padding:6px 8px;border-bottom:1px solid var(--border);text-align:right}
-  th:first-child,td:first-child{text-align:left}
-  th{color:var(--muted);font-weight:500;position:sticky;top:0;background:var(--panel)}
-  .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
-  .badge.easy{background:rgba(76,175,80,.25);color:#0f172a}
-  .badge.mod{background:rgba(255,179,0,.3);color:#0f172a}
-  .badge.hard{background:rgba(229,57,53,.22);color:#0f172a}
-  .badge.risk{background:rgba(220,38,38,.2);color:var(--danger)}
-  .badge.warn{background:rgba(217,119,6,.18);color:var(--warn)}
-  .badge.good{background:rgba(5,150,105,.18);color:var(--good)}
-  tr.top5 td{background:rgba(2,132,199,.08)}
-  tr.top5 td:first-child::before{content:"\2605 ";color:var(--accent)}
-  .scroll{max-height:420px;overflow:auto}
-  .legend-mini{font-size:11px;color:var(--muted);margin-top:4px}
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Arial, sans-serif;
+  }
+  header { display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:12px; margin-bottom: 20px; }
+  h1 { margin:0; font-size:22px; letter-spacing:0.2px; }
+  .meta { color: var(--muted); font-size: 13px; }
+  .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom:20px; }
+  .card { background: var(--panel); border:1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .card .label { color: var(--muted); font-size:12px; text-transform: uppercase; letter-spacing: 1px; }
+  .card .value { font-size: 22px; font-weight: 600; margin-top: 4px; }
+  .card .sub { color: var(--muted); font-size: 12px; margin-top:2px; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px; }
+  .panel { background: var(--panel); border:1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+  .panel h2 { margin: 0 0 8px 0; font-size: 14px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; }
+  .chartbox { position: relative; height: 280px; }
+  .wide { grid-column: 1 / -1; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 500; position: sticky; top:0; background: var(--panel); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .badge.easy { background: rgba(76,175,80,0.25); color: #0f172a; }
+  .badge.mod  { background: rgba(255,179,0,0.30); color: #0f172a; }
+  .badge.hard { background: rgba(229,57,53,0.22); color: #0f172a; }
+  .badge.unk  { background: rgba(96,125,139,0.22); color: #0f172a; }
+  tr.top5 td { background: rgba(2,132,199,0.08); }
+  tr.top5 td:first-child::before { content: "★ "; color: var(--accent); }
+  .warn {
+    background: #fef3c7; border:1px solid #fcd34d;
+    padding: 10px 12px; border-radius: 8px; color: #92400e; font-size: 13px;
+    margin-top: 14px;
+  }
+  .tabs { display:flex; gap:6px; margin-bottom: 8px; flex-wrap:wrap; }
+  .tab { padding: 4px 10px; border-radius: 999px; font-size: 12px; border:1px solid var(--border); color: var(--muted); cursor: pointer; }
+  .tab.active { background: var(--accent); color:#ffffff; border-color: var(--accent); font-weight:600; }
+  .scroll { max-height: 420px; overflow: auto; }
+  .legend-mini { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .goal-panel {
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    border: 1px solid var(--border); border-radius: 14px;
+    padding: 18px 20px; margin-bottom: 20px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center;
+  }
+  .goal-header { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .goal-header h2 { margin: 0; font-size: 13px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; }
+  .goal-target { font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing: 0.3px; }
+  .goal-target .unit { font-size: 14px; color: var(--muted); font-weight: 500; margin-left: 4px; }
+  .goal-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; padding: 3px 8px; border-radius: 999px; background: rgba(79,195,247,0.18); color: var(--accent); }
+  .goal-tag.done { background: rgba(76,175,80,0.22); color: var(--easy); }
+  .goal-row { display: flex; align-items: center; gap: 14px; }
+  .goal-stat { flex: 1; }
+  .goal-stat .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .goal-stat .v { font-size: 20px; font-weight: 600; }
+  .goal-bar { width: 100%; height: 18px; border-radius: 999px; background: rgba(15,23,42,0.08); overflow: hidden; position: relative; }
+  .goal-bar .fill { height: 100%; background: linear-gradient(90deg, #4fc3f7, #4caf50); transition: width .4s ease; }
+  .goal-bar .pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #001222; text-shadow: 0 1px 0 rgba(255,255,255,0.2); }
+  .goal-side { display: flex; flex-direction: column; gap: 10px; }
+  @media (max-width: 720px) { .goal-panel { grid-template-columns: 1fr; } }
 
-  /* Goal panel (Swim tab) */
-  .goal-panel{background:linear-gradient(135deg,#e0f2fe 0%,#bae6fd 100%);
-              border:1px solid var(--border);border-radius:14px;padding:18px 20px;
-              margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center}
-  .goal-header{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-  .goal-header h2{margin:0;font-size:13px;text-transform:uppercase;color:var(--muted);letter-spacing:1px}
-  .goal-target{font-size:28px;font-weight:700;letter-spacing:.3px}
-  .goal-target .unit{font-size:14px;color:var(--muted);font-weight:500;margin-left:4px}
-  .goal-tag{font-size:11px;text-transform:uppercase;letter-spacing:1px;padding:3px 8px;
-            border-radius:999px;background:rgba(79,195,247,.18);color:var(--accent)}
-  .goal-row{display:flex;align-items:center;gap:14px}
-  .goal-stat{flex:1}
-  .goal-stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
-  .goal-stat .v{font-size:20px;font-weight:600}
-  .goal-bar{width:100%;height:18px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden;position:relative}
-  .goal-bar .fill{height:100%;background:linear-gradient(90deg,#4fc3f7,#4caf50);transition:width .4s}
-  .goal-bar .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-                 font-size:11px;font-weight:700;color:#001222}
-  .goal-side{display:flex;flex-direction:column;gap:10px}
-  @media(max-width:720px){.goal-panel{grid-template-columns:1fr}}
+/* Action Plan button + modal */
+.ap-btn {
+display: inline-flex; align-items: center; gap: 6px;
+padding: 8px 14px; margin-top: 10px;
+background: linear-gradient(90deg, #0284c7, #0369a1);
+color: #ffffff; font-weight: 700; font-size: 13px;
+border: none; border-radius: 8px; cursor: pointer;
+box-shadow: 0 2px 8px rgba(79,195,247,0.35);
+transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.ap-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79,195,247,0.5); }
+.ap-btn:focus { outline: 2px solid var(–accent); outline-offset: 2px; }
+.ap-btn .arrow { font-size: 14px; }
 
-  /* Readiness banner (Physiology tab) */
-  .readiness{border-radius:14px;padding:18px 20px;margin-bottom:20px;
-             display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;
-             border:1px solid var(--border)}
-  .readiness.risk{background:linear-gradient(135deg,#fef2f2 0%,#fecaca 100%);border-color:#fca5a5}
-  .readiness.warn{background:linear-gradient(135deg,#fffbeb 0%,#fde68a 100%);border-color:#fcd34d}
-  .readiness.good{background:linear-gradient(135deg,#f0fdf4 0%,#bbf7d0 100%);border-color:#86efac}
-  .readiness-score{font-size:48px;font-weight:800;line-height:1}
-  .readiness-label{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
-  .readiness-message{font-size:15px;margin-top:6px;line-height:1.5}
-  .readiness-message b{color:var(--ink)}
+.ap-overlay {
+display: none; position: fixed; inset: 0;
+background: rgba(15,23,42,0.35); backdrop-filter: blur(6px);
+z-index: 1000; overflow-y: auto; padding: 28px 20px;
+}
+.ap-overlay.open { display: block; }
+.ap-modal {
+max-width: 900px; margin: 0 auto;
+background: var(–panel);
+border: 1px solid var(–border); border-radius: 14px;
+padding: 22px 24px; color: var(–ink);
+box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.ap-head { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; }
+.ap-head h2 { margin:0; font-size: 20px; }
+.ap-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.ap-btn-ghost {
+background: transparent; border: 1px solid var(–border);
+color: var(–ink); padding: 5px 10px; border-radius: 8px; cursor: pointer;
+font-size: 12.5px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+font-family: inherit;
+}
+.ap-btn-ghost:hover { border-color: var(–accent); color: var(–accent); }
+.ap-close {
+background: transparent; border: 1px solid var(–border);
+color: var(–muted); padding: 5px 10px; border-radius: 8px; cursor: pointer;
+font-size: 12.5px;
+}
+.ap-close:hover { color: var(–ink); border-color: var(–accent); }
+.ap-sub { color: var(–muted); font-size: 13px; margin-bottom: 16px; }
+.ap-section { margin-top: 18px; }
+.ap-section h3 {
+font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px;
+color: var(–accent); margin: 0 0 8px 0;
+}
+.ap-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+.ap-stat { background: var(–panel-2); border: 1px solid var(–border); border-radius: 10px; padding: 10px 12px; }
+.ap-stat .k { font-size: 11px; color: var(–muted); text-transform: uppercase; letter-spacing: 1px; }
+.ap-stat .v { font-size: 18px; font-weight: 600; margin-top: 2px; }
+.ap-stat .s { font-size: 11px; color: var(–muted); margin-top: 2px; }
+.ap-insights { padding-left: 18px; }
+.ap-insights li { margin: 4px 0; color: #334155; font-size: 13px; }
+.ap-toggle { display: inline-flex; background: var(–panel-2); border: 1px solid var(–border); border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+.ap-toggle button { background: transparent; color: var(–muted); padding: 6px 12px; border: none; font-size: 12px; cursor: pointer; }
+.ap-toggle button.active { background: var(–accent); color: #00222f; font-weight: 600; }
+.ap-week { background: var(–panel-2); border: 1px solid var(–border); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+.ap-week-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.ap-week-title { font-weight: 700; font-size: 14px; }
+.ap-week-long { font-size: 12px; color: var(–muted); }
+.ap-week-long b { color: var(–accent); }
+.ap-week.deload { border-color: rgba(255,179,0,0.35); }
+.ap-week.deload .ap-week-long b { color: var(–mod); }
+.ap-deload-tag { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; background: rgba(255,179,0,0.18); color: var(–mod); padding: 2px 6px; border-radius: 4px; }
+.ap-days { margin-top: 8px; display: grid; grid-template-columns: 1fr; gap: 6px; }
+.ap-day { font-size: 12.5px; color: #0f172a; background: #f1f5f9; padding: 6px 10px; border-radius: 6px; border-left: 3px solid var(–border); }
+.ap-day.long { border-left-color: var(–accent); }
+.ap-day b { color: var(–ink); }
+.ap-rules { padding-left: 18px; }
+.ap-rules li { margin: 5px 0; color: #334155; font-size: 13px; }
 
-  /* Physiology metric cards */
-  .phys-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
-  .phys-card.risk{border-left:4px solid var(--danger)}
-  .phys-card.warn{border-left:4px solid var(--warn)}
-  .phys-card.good{border-left:4px solid var(--good)}
-  .phys-card .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px}
-  .phys-card .value{font-size:24px;font-weight:700;margin-top:4px}
-  .phys-card .trend{font-size:12px;color:var(--muted);margin-top:2px}
-  .phys-card .trend .arrow-up{color:var(--good)}
-  .phys-card .trend .arrow-down{color:var(--danger)}
+/* Print view: only the action plan modal, on white paper */
+@media print {
+body { background: #fff !important; color: #111 !important; padding: 0; }
+header, .cards, .goal-panel, .grid, .tabs, .ap-toggle, .ap-actions, .ap-close { display: none !important; }
+.ap-overlay { display: block !important; position: static !important; background: #fff !important; padding: 0 !important; backdrop-filter: none !important; }
+.ap-modal { box-shadow: none !important; border: none !important; background: #fff !important; color: #111 !important; max-width: 100% !important; padding: 0 !important; }
+.ap-modal * { color: #111 !important; background: transparent !important; }
+.ap-stat, .ap-week, .ap-day { border: 1px solid #cfd6e6 !important; break-inside: avoid; }
+.ap-week.deload { border-color: #b26a00 !important; }
+.ap-section h3 { color: #1976d2 !important; }
+.ap-day.long { border-left: 3px solid #1976d2 !important; }
+a[href]:after { content: “”; }
+}
 
-  /* Watchlist */
-  .watchlist{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px}
-  .watchlist h2{margin:0 0 12px 0;font-size:14px;text-transform:uppercase;color:var(--muted);letter-spacing:1px}
-  .wl-item{padding:10px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start}
-  .wl-item:last-child{border-bottom:none}
-  .wl-icon{flex-shrink:0;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700}
-  .wl-icon.risk{background:rgba(220,38,38,.15);color:var(--danger)}
-  .wl-icon.warn{background:rgba(217,119,6,.15);color:var(--warn)}
-  .wl-icon.good{background:rgba(5,150,105,.15);color:var(--good)}
-  .wl-title{font-weight:600;font-size:14px;margin-bottom:2px}
-  .wl-body{font-size:13px;color:#475569;line-height:1.5}
+/* Recent Swim panel */
+.recent-panel {
+background: var(–panel); border: 1px solid var(–border); border-radius: 12px;
+padding: 16px 18px; margin-bottom: 14px;
+}
+.recent-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.recent-header h2 { margin: 0; font-size: 13px; text-transform: uppercase; color: var(–muted); letter-spacing: 1px; }
+.recent-date { color: var(–ink); font-size: 16px; font-weight: 600; margin-top: 4px; }
+.recent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.rstat { background: var(–panel-2); border: 1px solid var(–border); border-radius: 8px; padding: 10px 12px; }
+.rstat .k { color: var(–muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; }
+.rstat .v { font-size: 18px; font-weight: 600; margin-top: 2px; color: var(–ink); }
+.rstat .v .u { font-size: 12px; color: var(–muted); font-weight: 500; margin-left: 2px; }
 
-  .recent-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px}
-  .recent-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-  .recent-header h2{margin:0;font-size:13px;text-transform:uppercase;color:var(--muted);letter-spacing:1px}
-  .recent-date{color:var(--ink);font-size:16px;font-weight:600;margin-top:4px}
-  .recent-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
-  .rstat{background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
-  .rstat .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.8px}
-  .rstat .v{font-size:18px;font-weight:600;margin-top:2px}
-  .rstat .v .u{font-size:12px;color:var(--muted);font-weight:500;margin-left:2px}
+/* Comparison panel */
+.cmp-panel {
+background: var(–panel); border: 1px solid var(–border); border-radius: 12px;
+padding: 16px 18px; margin-bottom: 20px;
+}
+.cmp-header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+.cmp-header h2 { margin: 0; font-size: 13px; text-transform: uppercase; color: var(–muted); letter-spacing: 1px; }
+.cmp-meta { color: var(–muted); font-size: 11px; }
+.cmp-banner { background: #dcfce7; border: 1px solid #86efac; color: #166534; border-radius: 8px; padding: 8px 12px; font-size: 13px; margin-bottom: 10px; }
+.cmp-table { display: grid; gap: 0; }
+.cmp-thead, .cmp-row {
+display: grid;
+grid-template-columns: 1.3fr 1fr 1fr 0.8fr;
+gap: 10px;
+padding: 8px 6px;
+align-items: center;
+}
+.cmp-thead { color: var(–muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(–border); padding-bottom: 10px; }
+.cmp-thead .cmp-date { display: block; font-size: 10px; color: var(–muted); opacity: 0.7; font-weight: 400; margin-top: 2px; letter-spacing: 0.5px; }
+.cmp-row { border-bottom: 1px solid rgba(15,23,42,0.06); font-size: 13px; }
+.cmp-row:last-child { border-bottom: none; }
+.cmp-label { color: var(–muted); }
+.cmp-val { color: var(–ink); font-weight: 500; }
+.cmp-delta { text-align: right; font-size: 12px; }
+.delta.better { color: var(–easy); font-weight: 600; }
+.delta.worse { color: #dc2626; font-weight: 500; }
+.delta.same { color: var(–accent); font-weight: 500; }
 
-  /* Clickable metric labels */
-  .metric-link{cursor:pointer;border-bottom:1px dashed rgba(2,132,199,.45);transition:color .15s,border-color .15s}
-  .metric-link:hover{color:var(--accent);border-bottom-color:var(--accent)}
-  .metric-link:focus{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
-
-  /* Modal */
-  .m-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);z-index:1000;padding:24px;overflow-y:auto}
-  .m-overlay.open{display:block}
-  .m-modal{max-width:560px;margin:40px auto;background:#fff;border-radius:14px;padding:22px 26px;
-           box-shadow:0 20px 60px rgba(0,0,0,.3);border:1px solid var(--border)}
-  .m-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
-  .m-title{margin:0;font-size:20px;font-weight:700;color:var(--ink)}
-  .m-status{font-size:11px;text-transform:uppercase;letter-spacing:1px;padding:3px 10px;border-radius:999px;font-weight:700;white-space:nowrap}
-  .m-status.good{background:rgba(5,150,105,.15);color:var(--good)}
-  .m-status.warn{background:rgba(217,119,6,.15);color:var(--warn)}
-  .m-status.risk{background:rgba(220,38,38,.15);color:var(--danger)}
-  .m-status.neutral{background:rgba(100,116,139,.15);color:var(--muted)}
-  .m-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:0;line-height:1;margin-left:auto}
-  .m-close:hover{color:var(--ink)}
-  .m-section{margin-top:14px}
-  .m-section h4{margin:0 0 4px 0;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--accent);font-weight:700}
-  .m-section p{margin:0;font-size:14px;line-height:1.55;color:#334155}
-  .m-section.today{background:var(--panel-2);border-left:3px solid var(--accent);padding:10px 12px;border-radius:6px;margin-top:16px}
-  .m-section.today h4{color:var(--ink)}
-  .m-section.today p{color:var(--ink);font-weight:500}
+@media (max-width: 600px) {
+.cmp-thead, .cmp-row { grid-template-columns: 1.2fr 1fr 1fr 0.7fr; font-size: 12px; gap: 6px; }
+}
 
 </style>
 </head>
 <body>
 
-<div class="m-overlay" id="mOverlay" onclick="if(event.target===this)closeMetric()" role="dialog" aria-modal="true">
-  <div class="m-modal">
-    <div class="m-head">
-      <h3 class="m-title" id="mTitle"></h3>
-      <span class="m-status" id="mStatus"></span>
-      <button class="m-close" onclick="closeMetric()" aria-label="Close">×</button>
-    </div>
-    <div class="m-section"><h4>What it means</h4><p id="mWhat"></p></div>
-    <div class="m-section"><h4>Your optimal</h4><p id="mOptimal"></p></div>
-    <div class="m-section today"><h4>Where you are today</h4><p id="mToday"></p></div>
-  </div>
-</div>
-
-
 <header>
   <div>
     <h1>Swim Dashboard</h1>
-    <div class="meta">All-time swim sessions from Apple Watch · 63 sessions · First 7/1/2024 → Latest 4/23/2026</div>
+    <div class="meta">All-time swim sessions from Apple Watch · 61 sessions · First 7/1/2024 → Latest 4/18/2026</div>
   </div>
-  <div class="meta">Generated 4/24/2026 · Source: Apple Health</div>
+  <div class="meta">Generated 4/18/2026 · Updated with today's session · Source: HealthAutoExport-3/20/2024-4/17/2026.json</div>
 </header>
 
-<div class="tabs" role="tablist">
-  <button class="tab active" data-tab="swim">Swim Data</button>
-  <button class="tab" data-tab="phys">Physiology</button>
-</div>
-
-<!-- ════════════════════════════ SWIM TAB ════════════════════════════ -->
-<div class="tab-content active" id="tab-swim">
-
 <section class="cards">
-  <div class="card"><div class="label"><span class="metric-link" onclick="openMetric('sessions')">Sessions</span></div><div class="value">63</div><div class="sub">All-time</div></div>
-  <div class="card"><div class="label"><span class="metric-link" onclick="openMetric('total_distance')">Total Distance</span></div><div class="value">56.3 km</div><div class="sub">2,252 laps (25m each)</div></div>
-  <div class="card"><div class="label"><span class="metric-link" onclick="openMetric('total_time')">Total Time</span></div><div class="value">29h 44m</div><div class="sub">1,784 min</div></div>
-  <div class="card"><div class="label"><span class="metric-link" onclick="openMetric('overall_pace')">Overall Pace</span></div><div class="value">3:10</div><div class="sub">per 100m (incl. rest)</div></div>
-  <div class="card"><div class="label"><span class="metric-link" onclick="openMetric('effort_distribution')">Easy / Mod / Hard</span></div><div class="value">33 / 18 / 12</div><div class="sub">by avg HR</div></div>
+  <div class="card"><div class="label">Sessions</div><div class="value">61</div><div class="sub">All-time</div></div>
+  <div class="card"><div class="label">Total Distance</div><div class="value">53.1 km</div><div class="sub">2,123 laps (25m each)</div></div>
+  <div class="card"><div class="label">Total Time</div><div class="value">28h 9m</div><div class="sub">1,689 min</div></div>
+  <div class="card"><div class="label">Overall Pace</div><div class="value">3:11</div><div class="sub">per 100m (incl. rest)</div></div>
+  <div class="card"><div class="label">Easy / Mod / Hard</div><div class="value">33 / 16 / 12</div><div class="sub">by avg HR</div></div>
 </section>
 
 <section class="goal-panel">
   <div>
-    <div class="goal-header"><h2>Goal · Single Session</h2><span class="goal-tag">In progress</span></div>
+    <div class="goal-header">
+      <h2>Goal · Single Session</h2>
+      <span class="goal-tag ">In progress</span>
+    </div>
     <div class="goal-target">5,000 <span class="unit">meters in one swim</span></div>
-    <div class="meta" style="margin-top:6px">Keep building — 2,875 m to go</div>
+    <div class="meta" style="margin-top:6px">Keep building distance — 2,950 m to go</div>
   </div>
   <div class="goal-side">
     <div class="goal-row">
       <div class="goal-stat">
-        <div class="k"><span class="metric-link" onclick="openMetric('personal_best')">Personal Best</span></div>
-        <div class="v">2,125 m <span class="meta" style="font-weight:400">· 4/20/2026</span></div>
+        <div class="k">Personal Best</div>
+        <div class="v">2,050 m <span class="meta" style="font-weight:400">· 4/18/2026</span></div>
+        <button class="ap-btn" onclick="openActionPlan()">Action Plan <span class="arrow">→</span></button>
       </div>
-      <div class="goal-stat"><div class="k"><span class="metric-link" onclick="openMetric('progress')">Progress</span></div><div class="v">42.5%</div></div>
+      <div class="goal-stat">
+        <div class="k">Progress</div>
+        <div class="v">41.0%</div>
+      </div>
     </div>
     <div class="goal-bar">
-      <div class="fill" style="width:42.5%"></div>
-      <div class="pct">2,125 / 5,000 m</div>
+      <div class="fill" style="width: 41.0%"></div>
+      <div class="pct">2,050 / 5,000 m</div>
     </div>
     <div class="meta">Sessions within 10% of PB: <b style="color:var(--ink)">2</b></div>
-    <div class="meta">Projected goal date: <b style="color:var(--ink)">11/13/2026</b> · ~30 weeks at current rate</div>
+    <div class="meta">Projected goal date: <b style="color:var(--ink)">11/13/2026</b> <span style="opacity:0.75">· ~30 weeks at current rate</span></div>
   </div>
 </section>
-
 
 <section class="recent-panel">
   <div class="recent-header">
     <div>
       <h2>Most Recent Swim</h2>
-      <div class="recent-date">Thu, 2026-04-23 · 17:23</div>
+      <div class="recent-date">Saturday, April 18, 2026 · 09:14</div>
     </div>
-    <span class="badge mod">Moderate</span>
+    <span class="badge easy">Easy</span>
   </div>
   <div class="recent-grid">
-    <div class="rstat"><div class="k">Distance</div><div class="v">1,100 <span class="u">m</span></div></div>
-    <div class="rstat"><div class="k"><span class="metric-link" onclick="openMetric('laps')">Laps (25m)</span></div><div class="v">44</div></div>
-    <div class="rstat"><div class="k">Duration</div><div class="v">34:49 <span class="u">min</span></div></div>
-    <div class="rstat"><div class="k"><span class="metric-link" onclick="openMetric('pace_100m')">Pace /100m</span></div><div class="v">3:10</div></div>
-    <div class="rstat"><div class="k"><span class="metric-link" onclick="openMetric('avg_hr')">Avg HR</span></div><div class="v">139.0 <span class="u">bpm</span></div></div>
-    <div class="rstat"><div class="k"><span class="metric-link" onclick="openMetric('max_hr')">Max HR</span></div><div class="v">164 <span class="u">bpm</span></div></div>
-    <div class="rstat"><div class="k"><span class="metric-link" onclick="openMetric('strokes')">Strokes</span></div><div class="v">566</div></div>
-    <div class="rstat"><div class="k"><span class="metric-link" onclick="openMetric('swolf')">SWOLF</span></div><div class="v">60.4</div></div>
+    <div class="rstat"><div class="k">Distance</div><div class="v">2,050 <span class="u">m</span> <span class="u" style="margin-left:4px">· 1.27 mi</span></div></div>
+    <div class="rstat"><div class="k">Laps (25m)</div><div class="v">82</div></div>
+    <div class="rstat"><div class="k">Duration</div><div class="v">63:17 <span class="u">min</span></div></div>
+    <div class="rstat"><div class="k">Pace /100m</div><div class="v">3:05</div></div>
+    <div class="rstat"><div class="k">Avg HR</div><div class="v">121 <span class="u">bpm</span></div></div>
+    <div class="rstat"><div class="k">Max HR</div><div class="v">152 <span class="u">bpm</span></div></div>
+    <div class="rstat"><div class="k">Strokes</div><div class="v">1,065</div></div>
+    <div class="rstat"><div class="k">Cadence</div><div class="v">16.8 <span class="u">spm</span></div></div>
+    <div class="rstat"><div class="k">SWOLF</div><div class="v">59.3</div></div>
+    <div class="rstat"><div class="k">Calories</div><div class="v">702 <span class="u">kcal</span></div></div>
+    <div class="rstat"><div class="k">Strokes / Length</div><div class="v">13.0</div></div>
+    <div class="rstat"><div class="k">Rank (Distance)</div><div class="v">#1</div></div>
   </div>
 </section>
 
+<section class="cmp-panel">
+  <div class="cmp-header">
+    <h2>Most Recent vs Best Ever</h2>
+    <div class="cmp-meta">Best-ever = longest single-session distance</div>
+  </div>
+  <div class="cmp-banner">🏆 Today's swim IS your all-time best — new personal record.</div>
+  <div class="cmp-table">
+    <div class="cmp-thead">
+      <div></div>
+      <div>Most Recent <span class="cmp-date">4/18/2026</span></div>
+      <div>Best Ever <span class="cmp-date">4/18/2026</span></div>
+      <div>Δ</div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-label">Distance</div>
+      <div class="cmp-val">2,050 m <span style="color:var(--muted);font-weight:400">· 1.27 mi</span></div>
+      <div class="cmp-val">2,050 m <span style="color:var(--muted);font-weight:400">· 1.27 mi</span></div>
+      <div class="cmp-delta"><span class="delta same">Tied</span></div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-label">Duration</div>
+      <div class="cmp-val">63:17 min</div>
+      <div class="cmp-val">63:17 min</div>
+      <div class="cmp-delta"><span class="delta same">Tied</span></div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-label">Pace /100m</div>
+      <div class="cmp-val">3:05</div>
+      <div class="cmp-val">3:05</div>
+      <div class="cmp-delta"><span class="delta same">Tied</span></div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-label">Laps (25m)</div>
+      <div class="cmp-val">82</div>
+      <div class="cmp-val">82</div>
+      <div class="cmp-delta"><span class="delta same">Tied</span></div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-label">Avg HR</div>
+      <div class="cmp-val">121 bpm</div>
+      <div class="cmp-val">121 bpm</div>
+      <div class="cmp-delta"><span class="delta same">Tied</span></div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-label">Max HR</div>
+      <div class="cmp-val">152 bpm</div>
+      <div class="cmp-val">152 bpm</div>
+      <div class="cmp-delta"><span class="delta same">Tied</span></div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-label">Strokes</div>
+      <div class="cmp-val">1,065</div>
+      <div class="cmp-val">1,065</div>
+      <div class="cmp-delta"><span class="delta same">Tied</span></div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-label">Strokes/Length</div>
+      <div class="cmp-val">13.0</div>
+      <div class="cmp-val">13.0</div>
+      <div class="cmp-delta"><span class="delta same">Tied</span></div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-label">SWOLF</div>
+      <div class="cmp-val">59.3</div>
+      <div class="cmp-val">59.3</div>
+      <div class="cmp-delta"><span class="delta same">Tied</span></div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-label">Calories</div>
+      <div class="cmp-val">702 kcal</div>
+      <div class="cmp-val">702 kcal</div>
+      <div class="cmp-delta"><span class="delta same">Tied</span></div>
+    </div>
+    <div class="cmp-row">
+      <div class="cmp-label">Effort</div>
+      <div class="cmp-val">Easy</div>
+      <div class="cmp-val">Easy</div>
+      <div class="cmp-delta"><span class="delta same">—</span></div>
+    </div>
+  </div>
+</section>
 
 <section class="grid">
+
   <div class="panel wide">
     <h2>Distance &amp; Duration per Session</h2>
     <div class="chartbox"><canvas id="chartDistDur"></canvas></div>
+    <div class="legend-mini">Bars: distance (m) · Line: duration (min) · Hover a bar for details.</div>
   </div>
+
   <div class="panel">
-    <h2><span class="metric-link" onclick="openMetric('pace_100m')">Pace</span> Trend (per 100m)</h2>
+    <h2>Pace Trend (per 100m)</h2>
     <div class="chartbox"><canvas id="chartPace"></canvas></div>
     <div class="legend-mini">Lower is faster. Includes rest time.</div>
   </div>
+
   <div class="panel">
-    <h2><span class="metric-link" onclick="openMetric('avg_hr')">Heart Rate</span> per Session</h2>
+    <h2>Heart Rate per Session</h2>
     <div class="chartbox"><canvas id="chartHR"></canvas></div>
+    <div class="legend-mini">Avg &amp; Max HR.</div>
   </div>
+
   <div class="panel">
     <h2>Laps per Session (25m)</h2>
     <div class="chartbox"><canvas id="chartLaps"></canvas></div>
+    <div class="legend-mini">Derived as distance ÷ 25m.</div>
   </div>
+
   <div class="panel">
     <h2>Effort Distribution</h2>
     <div class="chartbox"><canvas id="chartEffort"></canvas></div>
-    <div class="legend-mini">Easy &lt; 125 bpm · Mod 125-139 · Hard \u2265 140</div>
+    <div class="legend-mini">Easy &lt; 125 bpm · Moderate 125–139 · Hard ≥ 140</div>
   </div>
+
   <div class="panel">
-    <h2><span class="metric-link" onclick="openMetric('swolf')">SWOLF</span> Trend</h2>
+    <h2>SWOLF Trend</h2>
     <div class="chartbox"><canvas id="chartSWOLF"></canvas></div>
-    <div class="legend-mini">Lower = more efficient.</div>
+    <div class="legend-mini">Approx: sec/length + strokes/length (lower = more efficient).</div>
   </div>
+
   <div class="panel wide">
-    <h2>All Sessions <span class="meta" style="margin-left:8px;text-transform:none;letter-spacing:0">\u2605 = top 5 by combined distance+time</span></h2>
+    <h2>All Sessions <span class="meta" style="margin-left:8px; text-transform:none; letter-spacing:0">★ = top 5 by combined distance+time</span></h2>
     <div class="scroll">
       <table id="tbl">
-        <thead><tr>
-          <th>Date</th><th>Start</th><th>Effort</th><th>Distance (m)</th><th>Laps</th>
-          <th>Duration (min)</th><th>Pace /100m</th><th>Avg HR</th><th>Max HR</th>
-          <th>Strokes</th><th>SWOLF</th><th>kCal</th>
-        </tr></thead>
+        <thead>
+          <tr>
+            <th>Date</th><th>Start</th><th>Effort</th><th>Distance (m)</th><th>Laps</th>
+            <th>Duration (min)</th><th>Pace /100m</th><th>Avg HR</th><th>Max HR</th>
+            <th>Strokes</th><th>SWOLF</th><th>kCal</th>
+          </tr>
+        </thead>
         <tbody></tbody>
       </table>
     </div>
   </div>
-</section>
 
-</div>
-
-<!-- ════════════════════════════ PHYSIOLOGY TAB ════════════════════════════ -->
-<div class="tab-content" id="tab-phys">
-
-
-<div class="readiness risk">
-  <div>
-    <div class="readiness-label">Today's Readiness</div>
-    <div class="readiness-score">50<span style="font-size:18px;color:var(--muted);font-weight:500">/100</span></div>
-    <div class="readiness-label" style="margin-top:4px">CAUTION</div>
-  </div>
-  <div class="readiness-message"><b>Workload has spiked faster than fitness can absorb</b> (ACWR 1.8). This is the classic pattern that precedes overuse injury, especially relevant with the L4-L5 fusion. Hold Saturday to the prescribed 2,100m, keep HR under 135 bpm, and no stretching beyond the weekly plan. Next week consider a micro-deload if fatigue markers stay elevated.</div>
-</div>
-
-<div class="watchlist"><h2>Exercise Physiologist's Watchlist</h2><div class="wl-item"><div class="wl-icon risk">!</div><div><div class="wl-title">ACWR in injury-risk zone</div><div class="wl-body">Acute:Chronic Workload Ratio is <b>1.8</b> (safe window 0.8–1.3). Weekly volume tripled in the last 3 weeks — the spine and shoulder tissues haven't had time to remodel to that load. Hold this week's plan as written, do not add volume.</div></div></div><div class="wl-item"><div class="wl-icon risk">↓</div><div><div class="wl-title">Deeply negative Training Stress Balance</div><div class="wl-body">TSB is <b>-73.5</b>. This reflects fatigue dominating fitness — a PB attempt in this state is physiologically inadvisable. Prioritise the deload in Week 4 (already scheduled).</div></div></div><div class="wl-item"><div class="wl-icon good">↑</div><div><div class="wl-title">Aerobic capacity improving</div><div class="wl-body">VO₂ max up <b>+3.57 mL/kg/min</b> over 6 months (now <b>39.09</b>). That's a meaningful gain and directly supports the 5,000m goal — oxygen transport is keeping pace with the volume build.</div></div></div><div class="wl-item"><div class="wl-icon good">✓</div><div><div class="wl-title">Autonomic recovery holding</div><div class="wl-body">7-day HRV average <b>31.1ms</b> vs 90-day baseline <b>28.4ms</b>. Parasympathetic recovery is not being overwhelmed by the current load — continue monitoring.</div></div></div><div class="wl-item"><div class="wl-icon good">✓</div><div><div class="wl-title">Today's HRV is strong</div><div class="wl-body">Latest reading <b>43.8ms</b> is well above baseline — a good signal going into Saturday's long swim.</div></div></div><div class="wl-item"><div class="wl-icon good">✓</div><div><div class="wl-title">Stroke efficiency improving</div><div class="wl-body">Last 5 sessions avg SWOLF <b>57.6</b> — stroke economy is converging as distance grows, not degrading. That's what you want to see for a 5k-capable stroke.</div></div></div><div class="wl-item"><div class="wl-icon warn">?</div><div><div class="wl-title">Sleep data sparse</div><div class="wl-body">Only 1 sleep sample detected in the last 30 days. Sleep is the single highest-ROI recovery input at this training load. Wearing the watch overnight would add a major missing dimension to this dashboard.</div></div></div></div>
-
-<section class="cards">
-  <div class="phys-card good"><div class="label"><span class="metric-link" onclick="openMetric('hrv')">HRV Today</span></div><div class="value">43.8<span style="font-size:14px;color:var(--muted)"> ms</span></div><div class="trend">7d avg 31.1 · baseline 28.4</div></div>
-  <div class="phys-card warn"><div class="label"><span class="metric-link" onclick="openMetric('rhr')">Resting HR</span></div><div class="value">71<span style="font-size:14px;color:var(--muted)"> bpm</span></div><div class="trend">7d avg 68.4 · baseline 69.6</div></div>
-  <div class="phys-card good"><div class="label"><span class="metric-link" onclick="openMetric('vo2max')">VO₂ Max</span></div><div class="value">39.09<span style="font-size:14px;color:var(--muted)"> mL/kg/min</span></div><div class="trend"><span class="arrow-up">↑</span> +3.57 over 6 months</div></div>
-  <div class="phys-card risk"><div class="label"><span class="metric-link" onclick="openMetric('acwr')">ACWR</span></div><div class="value">1.8</div><div class="trend">injury-risk zone</div></div>
-  <div class="phys-card risk"><div class="label"><span class="metric-link" onclick="openMetric('tsb')">TSB (Form)</span></div><div class="value">-73.5</div><div class="trend">deeply fatigued · CTL 91.4 / ATL 164.9</div></div>
-</section>
-
-<section class="grid">
   <div class="panel wide">
-    <h2>Training Load \u00B7 ATL / CTL / TSB</h2>
-    <div class="chartbox" style="height:320px"><canvas id="chartLoad"></canvas></div>
-    <div class="legend-mini">ATL (pink) = short-term fatigue (7d) \u00B7 CTL (blue) = long-term fitness (42d) \u00B7 TSB (green) = form (CTL\u2212ATL). Positive TSB = fresh; deeply negative = fatigued.</div>
+    <div class="warn">
+      Stroke-type breakdown (free / back / breast / fly) is not available in the current
+      HealthAutoExport JSON. Apple Health records stroke style per lap, but this export
+      doesn't expose it. To add that chart, you'd need a richer export (e.g., HKSwimStyle
+      metadata via HealthFit or a custom Shortcut).
+    </div>
   </div>
-  <div class="panel">
-    <h2><span class="metric-link" onclick="openMetric('acwr')">ACWR</span> (Acute:Chronic Workload)</h2>
-    <div class="chartbox"><canvas id="chartACWR"></canvas></div>
-    <div class="legend-mini">Sweet spot: 0.8\u20131.3 (shaded green). Above 1.5 = injury-risk territory (Gabbett 2016).</div>
-  </div>
-  <div class="panel">
-    <h2>Weekly Training Volume</h2>
-    <div class="chartbox"><canvas id="chartWeekly"></canvas></div>
-    <div class="legend-mini">Last 16 weeks. Sharp spikes &gt; 30% wk-over-wk raise injury risk.</div>
-  </div>
-  <div class="panel">
-    <h2>HRV (90 days) \u00B7 baseline band</h2>
-    <div class="chartbox"><canvas id="chartHRV"></canvas></div>
-    <div class="legend-mini">Suppressed (&lt; 20ms) = fatigue signal. Band = personal baseline range.</div>
-  </div>
-  <div class="panel">
-    <h2><span class="metric-link" onclick="openMetric('rhr')">Resting Heart Rate</span> (90 days)</h2>
-    <div class="chartbox"><canvas id="chartRHR"></canvas></div>
-    <div class="legend-mini">Rising RHR over several days = fatigue, illness, or dehydration.</div>
-  </div>
-  <div class="panel">
-    <h2>VO\u2082 Max Trajectory (6 months)</h2>
-    <div class="chartbox"><canvas id="chartVO2"></canvas></div>
-    <div class="legend-mini">Estimated cardiorespiratory fitness (mL/kg/min). Age-expected gain with training: 5\u201315% annually.</div>
-  </div>
-  <div class="panel">
-    <h2><span class="metric-link" onclick="openMetric('walking_hr')">Walking HR</span> (aerobic base fitness)</h2>
-    <div class="chartbox"><canvas id="chartWalkHR"></canvas></div>
-    <div class="legend-mini">Lower = better cardiac efficiency. Typical adult range: 90\u2013115 bpm during low-intensity movement.</div>
-  </div>
-  <div class="panel">
-    <h2>Blood Oxygen (SpO\u2082)</h2>
-    <div class="chartbox"><canvas id="chartSpO2"></canvas></div>
-    <div class="legend-mini">Healthy: 95\u2013100%. Single dips below 93% are usually measurement artefacts.</div>
-  </div>
-  <div class="panel">
-    <h2><span class="metric-link" onclick="openMetric('aerobic_efficiency')">Swim Aerobic Efficiency</span></h2>
-    <div class="chartbox"><canvas id="chartAeroEff"></canvas></div>
-    <div class="legend-mini">Distance covered per HR-beat minute. Upward trend = improving aerobic economy.</div>
-  </div>
-</section>
 
-</div>
+</section>
 
 <script>
-/* ═══════════════ DATA ═══════════════ */
-var SESSIONS = [{"id": "898985E9-AB1E-4207-B47C-1F247E59B517", "date": "2024-07-01", "weekday": "Mon", "start_time": "13:35", "timestamp": "2024-07-01T13:35:11-04:00", "duration_s": 579.2182480096817, "duration_min": 9.65, "distance_m": 325.0, "laps": 13, "pace_per_100m_s": 178.22099938759436, "pace_str": "2:58", "avg_hr": 107.6, "max_hr": 117, "kcal": 88.0, "strokes": 118, "cadence_spm": 12.2, "swolf": 53.6, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 59, "rank_duration": 60, "combined_rank": 119, "trimp": 44.6, "aerobic_eff": 0.313}, {"id": "8C125DFD-D347-434E-9109-3025A1E972C8", "date": "2024-07-01", "weekday": "Mon", "start_time": "17:13", "timestamp": "2024-07-01T17:13:46-04:00", "duration_s": 2334.192061662674, "duration_min": 38.9, "distance_m": 550.0, "laps": 22, "pace_per_100m_s": 424.3985566659407, "pace_str": "7:04", "avg_hr": 91.8, "max_hr": 108, "kcal": 140.0, "strokes": 135, "cadence_spm": 3.5, "swolf": 112.2, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 53, "rank_duration": 10, "combined_rank": 63, "trimp": 132.9, "aerobic_eff": 0.154}, {"id": "F79CC8E6-A3E1-47A3-9C60-9DDEBCD747A6", "date": "2024-07-04", "weekday": "Thu", "start_time": "10:51", "timestamp": "2024-07-04T10:51:55-04:00", "duration_s": 160.75665390491486, "duration_min": 2.68, "distance_m": 125.0, "laps": 5, "pace_per_100m_s": 128.6053231239319, "pace_str": "2:09", "avg_hr": 113.4, "max_hr": 115, "kcal": 28.0, "strokes": 40, "cadence_spm": 14.9, "swolf": 40.2, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 62, "rank_duration": 63, "combined_rank": 125, "trimp": 15.5, "aerobic_eff": 0.411}, {"id": "D95ABA3B-1FAB-40A6-B8B4-F7A497D40F3D", "date": "2024-07-04", "weekday": "Thu", "start_time": "11:12", "timestamp": "2024-07-04T11:12:27-04:00", "duration_s": 960.8409949541092, "duration_min": 16.01, "distance_m": 450.0, "laps": 18, "pace_per_100m_s": 213.52022110091315, "pace_str": "3:34", "avg_hr": 115.5, "max_hr": 136, "kcal": 135.0, "strokes": 196, "cadence_spm": 12.2, "swolf": 64.3, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 55, "rank_duration": 55, "combined_rank": 110, "trimp": 99.7, "aerobic_eff": 0.243}, {"id": "6F2A4902-A6F1-4C37-915D-3B839F1D7299", "date": "2024-07-04", "weekday": "Thu", "start_time": "17:07", "timestamp": "2024-07-04T17:07:51-04:00", "duration_s": 841.801741361618, "duration_min": 14.03, "distance_m": 225.0, "laps": 9, "pace_per_100m_s": 374.13410727183026, "pace_str": "6:14", "avg_hr": 97.2, "max_hr": 104, "kcal": 132.0, "strokes": 140, "cadence_spm": 10.0, "swolf": 109.1, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 60, "rank_duration": 57, "combined_rank": 117, "trimp": 47.9, "aerobic_eff": 0.165}, {"id": "405166A9-DF48-4358-98AB-903E26703D67", "date": "2024-07-05", "weekday": "Fri", "start_time": "13:49", "timestamp": "2024-07-05T13:49:31-04:00", "duration_s": 1061.673371911049, "duration_min": 17.69, "distance_m": 725.0, "laps": 29, "pace_per_100m_s": 146.4377064704895, "pace_str": "2:26", "avg_hr": 113.7, "max_hr": 128, "kcal": 205.0, "strokes": 298, "cadence_spm": 16.8, "swolf": 46.9, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 39, "rank_duration": 53, "combined_rank": 92, "trimp": 103.2, "aerobic_eff": 0.36}, {"id": "14CD4352-3BA7-4DC8-91FC-DA9792CCB45A", "date": "2024-07-06", "weekday": "Sat", "start_time": "13:46", "timestamp": "2024-07-06T13:46:06-04:00", "duration_s": 520.36445915699, "duration_min": 8.67, "distance_m": 225.0, "laps": 9, "pace_per_100m_s": 231.27309295866223, "pace_str": "3:51", "avg_hr": 103.7, "max_hr": 110, "kcal": 58.0, "strokes": 66, "cadence_spm": 7.6, "swolf": 65.2, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 61, "rank_duration": 61, "combined_rank": 122, "trimp": 34.2, "aerobic_eff": 0.25}, {"id": "2968B0E3-33E0-4DEA-BB45-FDF50AC6C81A", "date": "2024-07-10", "weekday": "Wed", "start_time": "15:12", "timestamp": "2024-07-10T15:12:31-04:00", "duration_s": 1157.7729510068893, "duration_min": 19.3, "distance_m": 800.0, "laps": 32, "pace_per_100m_s": 144.72161887586117, "pace_str": "2:25", "avg_hr": 100.2, "max_hr": 105, "kcal": 145.0, "strokes": 217, "cadence_spm": 11.2, "swolf": 43.0, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 32, "rank_duration": 47, "combined_rank": 79, "trimp": 65.9, "aerobic_eff": 0.414}, {"id": "AA51B2BD-4778-4B93-9BBC-235B00467019", "date": "2024-07-11", "weekday": "Thu", "start_time": "12:16", "timestamp": "2024-07-11T12:16:09-04:00", "duration_s": 1419.2085679769516, "duration_min": 23.65, "distance_m": 825.0, "laps": 33, "pace_per_100m_s": 172.0252809669032, "pace_str": "2:52", "avg_hr": 103.7, "max_hr": 118, "kcal": 206.0, "strokes": 264, "cadence_spm": 11.2, "swolf": 51.0, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 30, "rank_duration": 39, "combined_rank": 69, "trimp": 93.2, "aerobic_eff": 0.336}, {"id": "1C0CC8A9-DCAC-4526-9D8B-A44466C89ED0", "date": "2024-07-17", "weekday": "Wed", "start_time": "16:28", "timestamp": "2024-07-17T16:28:52-04:00", "duration_s": 318.7450909614563, "duration_min": 5.31, "distance_m": 100.0, "laps": 4, "pace_per_100m_s": 318.7450909614563, "pace_str": "5:19", "avg_hr": 113.6, "max_hr": 124.0, "kcal": 37.0, "strokes": 53, "cadence_spm": 10.0, "swolf": 92.9, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 63, "rank_duration": 62, "combined_rank": 125, "trimp": 30.9, "aerobic_eff": 0.166}, {"id": "1687D24C-DB9A-4C55-A485-7360E7C84013", "date": "2024-07-17", "weekday": "Wed", "start_time": "16:34", "timestamp": "2024-07-17T16:34:23-04:00", "duration_s": 763.7891209125519, "duration_min": 12.73, "distance_m": 350.0, "laps": 14, "pace_per_100m_s": 218.22546311787195, "pace_str": "3:38", "avg_hr": 121.4, "max_hr": 138, "kcal": 139.0, "strokes": 198, "cadence_spm": 15.6, "swolf": 68.7, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 56, "rank_duration": 59, "combined_rank": 115, "trimp": 97.5, "aerobic_eff": 0.226}, {"id": "6926A5F8-D7E6-42AA-B882-C0F0C3B1F948", "date": "2024-07-22", "weekday": "Mon", "start_time": "16:08", "timestamp": "2024-07-22T16:08:49-04:00", "duration_s": 938.8391319513321, "duration_min": 15.65, "distance_m": 500.0, "laps": 20, "pace_per_100m_s": 187.7678263902664, "pace_str": "3:08", "avg_hr": 121.7, "max_hr": 147, "kcal": 204.0, "strokes": 285, "cadence_spm": 18.2, "swolf": 61.2, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 54, "rank_duration": 56, "combined_rank": 110, "trimp": 121.1, "aerobic_eff": 0.263}, {"id": "05B7C933-1005-4F25-98CC-5A685DAC63E3", "date": "2024-07-24", "weekday": "Wed", "start_time": "17:33", "timestamp": "2024-07-24T17:33:50-04:00", "duration_s": 1067.8307819366455, "duration_min": 17.8, "distance_m": 600.0, "laps": 24, "pace_per_100m_s": 177.97179698944092, "pace_str": "2:58", "avg_hr": 123.6, "max_hr": 150, "kcal": 210.0, "strokes": 289.0, "cadence_spm": 16.2, "swolf": 56.5, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 48, "rank_duration": 52, "combined_rank": 100, "trimp": 146.8, "aerobic_eff": 0.273}, {"id": "673514C5-CDA0-4E2B-AC08-CA720E1DB8A5", "date": "2024-07-27", "weekday": "Sat", "start_time": "11:07", "timestamp": "2024-07-27T11:07:39-04:00", "duration_s": 1119.6321210861206, "duration_min": 18.66, "distance_m": 575.0, "laps": 23, "pace_per_100m_s": 194.71862975410792, "pace_str": "3:15", "avg_hr": 132.5, "max_hr": 149, "kcal": 224.0, "strokes": 321, "cadence_spm": 17.2, "swolf": 62.6, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 51, "rank_duration": 49, "combined_rank": 100, "trimp": 204.9, "aerobic_eff": 0.233}, {"id": "5ECBEC88-C2D5-4661-890E-4201B69713D5", "date": "2024-07-29", "weekday": "Mon", "start_time": "16:18", "timestamp": "2024-07-29T16:18:04-04:00", "duration_s": 1272.7534749507904, "duration_min": 21.21, "distance_m": 700.0, "laps": 28, "pace_per_100m_s": 181.82192499297005, "pace_str": "3:02", "avg_hr": 134.8, "max_hr": 165, "kcal": 277.0, "strokes": 412.0, "cadence_spm": 19.4, "swolf": 60.2, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 40, "rank_duration": 43, "combined_rank": 83, "trimp": 250.0, "aerobic_eff": 0.245}, {"id": "5E5C333F-DBBE-454D-8956-8680D0EF9699", "date": "2024-08-01", "weekday": "Thu", "start_time": "17:25", "timestamp": "2024-08-01T17:25:26-04:00", "duration_s": 1025.6614019870758, "duration_min": 17.09, "distance_m": 575.0, "laps": 23, "pace_per_100m_s": 178.3758959977523, "pace_str": "2:58", "avg_hr": 139.8, "max_hr": 160, "kcal": 232.0, "strokes": 336, "cadence_spm": 19.7, "swolf": 59.2, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 52, "rank_duration": 54, "combined_rank": 106, "trimp": 234.2, "aerobic_eff": 0.241}, {"id": "1C4E600B-2220-428A-B3E3-B67BB12400C5", "date": "2024-08-07", "weekday": "Wed", "start_time": "16:21", "timestamp": "2024-08-07T16:21:42-04:00", "duration_s": 1441.5310579538345, "duration_min": 24.03, "distance_m": 750.0, "laps": 30, "pace_per_100m_s": 192.20414106051126, "pace_str": "3:12", "avg_hr": 123.2, "max_hr": 135, "kcal": 298.0, "strokes": 421.0, "cadence_spm": 17.5, "swolf": 62.1, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 36, "rank_duration": 37, "combined_rank": 73, "trimp": 195.5, "aerobic_eff": 0.253}, {"id": "6547F019-3859-48BD-939A-55A9D1A14BB4", "date": "2024-08-12", "weekday": "Mon", "start_time": "17:52", "timestamp": "2024-08-12T17:52:57-04:00", "duration_s": 1110.1267020702362, "duration_min": 18.5, "distance_m": 600.0, "laps": 24, "pace_per_100m_s": 185.02111701170602, "pace_str": "3:05", "avg_hr": 134.6, "max_hr": 151, "kcal": 195.0, "strokes": 209, "cadence_spm": 11.3, "swolf": 55.0, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 49, "rank_duration": 50, "combined_rank": 99, "trimp": 216.7, "aerobic_eff": 0.241}, {"id": "66C0640C-EEAC-405D-BED7-A63917D9C6BC", "date": "2024-09-01", "weekday": "Sun", "start_time": "11:34", "timestamp": "2024-09-01T11:34:56-04:00", "duration_s": 1946.4711220264435, "duration_min": 32.44, "distance_m": 1100.0, "laps": 44, "pace_per_100m_s": 176.95192018422213, "pace_str": "2:57", "avg_hr": 124.4, "max_hr": 145, "kcal": 402.0, "strokes": 542, "cadence_spm": 16.7, "swolf": 56.6, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 15, "rank_duration": 22, "combined_rank": 37, "trimp": 274.7, "aerobic_eff": 0.273}, {"id": "53FFA8B8-F8D3-4608-B542-5045F8DBE26D", "date": "2024-09-21", "weekday": "Sat", "start_time": "09:04", "timestamp": "2024-09-21T09:04:27-04:00", "duration_s": 2119.661535024643, "duration_min": 35.33, "distance_m": 1051.6, "laps": 42, "pace_per_100m_s": 201.5730418074717, "pace_str": "3:22", "avg_hr": 122.1, "max_hr": 137, "kcal": 395.0, "strokes": 393.0, "cadence_spm": 11.1, "swolf": 59.8, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 17, "rank_duration": 17, "combined_rank": 34, "trimp": 277.1, "aerobic_eff": 0.244}, {"id": "A7F51500-54A7-4BE7-AB49-26D79EA99B75", "date": "2024-09-28", "weekday": "Sat", "start_time": "09:06", "timestamp": "2024-09-28T09:06:31-04:00", "duration_s": 1473.515014052391, "duration_min": 24.56, "distance_m": 800.0, "laps": 32, "pace_per_100m_s": 184.18937675654888, "pace_str": "3:04", "avg_hr": 122.3, "max_hr": 139.0, "kcal": 256.0, "strokes": 303.0, "cadence_spm": 12.3, "swolf": 55.5, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 33, "rank_duration": 35, "combined_rank": 68, "trimp": 193.9, "aerobic_eff": 0.266}, {"id": "A21093CD-FA91-47FE-901C-9C0EBA52C8A7", "date": "2024-09-30", "weekday": "Mon", "start_time": "13:30", "timestamp": "2024-09-30T13:30:02-04:00", "duration_s": 1529.59896504879, "duration_min": 25.49, "distance_m": 850.0, "laps": 34, "pace_per_100m_s": 179.9528194175047, "pace_str": "3:00", "avg_hr": 129.6, "max_hr": 149, "kcal": 296.0, "strokes": 348.0, "cadence_spm": 13.7, "swolf": 55.2, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 28, "rank_duration": 33, "combined_rank": 61, "trimp": 255.5, "aerobic_eff": 0.257}, {"id": "8996468F-42B2-464F-B681-E763132AD2B9", "date": "2024-10-03", "weekday": "Thu", "start_time": "12:31", "timestamp": "2024-10-03T12:31:46-04:00", "duration_s": 1334.994518995285, "duration_min": 22.25, "distance_m": 700.0, "laps": 28, "pace_per_100m_s": 190.71350271361214, "pace_str": "3:11", "avg_hr": 120.4, "max_hr": 135, "kcal": 246.0, "strokes": 319, "cadence_spm": 14.3, "swolf": 59.1, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 41, "rank_duration": 42, "combined_rank": 83, "trimp": 164.7, "aerobic_eff": 0.261}, {"id": "66802C4B-6EE6-448E-A6E9-AA6EA42D4DBF", "date": "2024-11-01", "weekday": "Fri", "start_time": "15:37", "timestamp": "2024-11-01T15:37:17-04:00", "duration_s": 1413.9027750492096, "duration_min": 23.57, "distance_m": 700.0, "laps": 28, "pace_per_100m_s": 201.98611072131567, "pace_str": "3:22", "avg_hr": 115.9, "max_hr": 130, "kcal": 236.0, "strokes": 343.0, "cadence_spm": 14.6, "swolf": 62.7, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 42, "rank_duration": 41, "combined_rank": 83, "trimp": 149.0, "aerobic_eff": 0.256}, {"id": "8AC445F8-EB70-414E-8920-6CD0B6A37E72", "date": "2025-02-09", "weekday": "Sun", "start_time": "11:03", "timestamp": "2025-02-09T11:03:37-05:00", "duration_s": 2508.0520960092545, "duration_min": 41.8, "distance_m": 350.0, "laps": 14, "pace_per_100m_s": 716.5863131455013, "pace_str": "11:57", "avg_hr": 94.8, "max_hr": 125.0, "kcal": 173.0, "strokes": 178.0, "cadence_spm": 4.3, "swolf": 191.9, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 57, "rank_duration": 8, "combined_rank": 65, "trimp": 142.8, "aerobic_eff": 0.088}, {"id": "DDE88828-8056-4D15-B636-2EDF34CAD688", "date": "2025-02-28", "weekday": "Fri", "start_time": "14:28", "timestamp": "2025-02-28T14:28:34-05:00", "duration_s": 1224.974315047264, "duration_min": 20.42, "distance_m": 650.0, "laps": 26, "pace_per_100m_s": 188.45758693034833, "pace_str": "3:08", "avg_hr": 121.0, "max_hr": 140, "kcal": 215.0, "strokes": 299, "cadence_spm": 14.6, "swolf": 58.6, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 44, "rank_duration": 45, "combined_rank": 89, "trimp": 154.3, "aerobic_eff": 0.263}, {"id": "2CD6AAD6-F263-42AB-BA4E-A8C764D9E0B3", "date": "2025-06-20", "weekday": "Fri", "start_time": "18:35", "timestamp": "2025-06-20T18:35:00-04:00", "duration_s": 1668.9431639909744, "duration_min": 27.82, "distance_m": 750.0, "laps": 30, "pace_per_100m_s": 222.5257551987966, "pace_str": "3:43", "avg_hr": 133.8, "max_hr": 160, "kcal": 199.0, "strokes": 342, "cadence_spm": 12.3, "swolf": 67.0, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 37, "rank_duration": 30, "combined_rank": 67, "trimp": 318.0, "aerobic_eff": 0.201}, {"id": "C60F48EB-486A-4A73-969E-1CFF1235883C", "date": "2025-06-25", "weekday": "Wed", "start_time": "18:31", "timestamp": "2025-06-25T18:31:43-04:00", "duration_s": 1424.4602440595627, "duration_min": 23.74, "distance_m": 825.0, "laps": 33, "pace_per_100m_s": 172.66184776479548, "pace_str": "2:53", "avg_hr": 128.4, "max_hr": 145, "kcal": 310.0, "strokes": 347, "cadence_spm": 14.6, "swolf": 53.7, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 31, "rank_duration": 38, "combined_rank": 69, "trimp": 229.0, "aerobic_eff": 0.271}, {"id": "01590AD8-99B7-4855-88DA-70C95FF8E95D", "date": "2025-06-26", "weekday": "Thu", "start_time": "17:30", "timestamp": "2025-06-26T17:30:24-04:00", "duration_s": 1667.096566915512, "duration_min": 27.78, "distance_m": 850.0, "laps": 34, "pace_per_100m_s": 196.12900787241318, "pace_str": "3:16", "avg_hr": 133.3, "max_hr": 148, "kcal": 374.0, "strokes": 448.0, "cadence_spm": 16.1, "swolf": 62.2, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 29, "rank_duration": 31, "combined_rank": 60, "trimp": 312.7, "aerobic_eff": 0.23}, {"id": "65C85E43-B0F8-49D1-ABCF-0414A1176F6F", "date": "2025-06-29", "weekday": "Sun", "start_time": "15:21", "timestamp": "2025-06-29T15:21:09-04:00", "duration_s": 2000.5646579265594, "duration_min": 33.34, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 200.05646579265596, "pace_str": "3:20", "avg_hr": 122.8, "max_hr": 134, "kcal": 480.0, "strokes": 574, "cadence_spm": 17.2, "swolf": 64.4, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 20, "rank_duration": 20, "combined_rank": 40, "trimp": 267.7, "aerobic_eff": 0.244}, {"id": "18FC9541-EAFC-4276-B122-D3B8A05C1728", "date": "2025-06-30", "weekday": "Mon", "start_time": "17:26", "timestamp": "2025-06-30T17:26:39-04:00", "duration_s": 3036.7860530614853, "duration_min": 50.61, "distance_m": 1650.0, "laps": 66, "pace_per_100m_s": 184.04763957948396, "pace_str": "3:04", "avg_hr": 132.4, "max_hr": 154.0, "kcal": 797.0, "strokes": 1021.0, "cadence_spm": 20.2, "swolf": 61.5, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 7, "rank_duration": 4, "combined_rank": 11, "trimp": 554.0, "aerobic_eff": 0.246}, {"id": "4396977C-6DD5-4862-9381-2FF7807D7ACD", "date": "2025-07-04", "weekday": "Fri", "start_time": "11:20", "timestamp": "2025-07-04T11:20:59-04:00", "duration_s": 1700.471195101738, "duration_min": 28.34, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 170.0471195101738, "pace_str": "2:50", "avg_hr": 121.1, "max_hr": 153, "kcal": 447.0, "strokes": 490.0, "cadence_spm": 17.3, "swolf": 54.8, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 21, "rank_duration": 29, "combined_rank": 50, "trimp": 214.8, "aerobic_eff": 0.291}, {"id": "26AEA2F4-BAC0-478D-BA94-9F723A84FD16", "date": "2025-07-09", "weekday": "Wed", "start_time": "17:28", "timestamp": "2025-07-09T17:28:09-04:00", "duration_s": 2954.1153349876404, "duration_min": 49.24, "distance_m": 1700.0, "laps": 68, "pace_per_100m_s": 173.7714902933906, "pace_str": "2:54", "avg_hr": 128.4, "max_hr": 146, "kcal": 711.0, "strokes": 814, "cadence_spm": 16.5, "swolf": 55.4, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 5, "rank_duration": 6, "combined_rank": 11, "trimp": 475.0, "aerobic_eff": 0.269}, {"id": "7F3BEC19-B140-483C-8170-23805389E8C8", "date": "2025-07-16", "weekday": "Wed", "start_time": "17:51", "timestamp": "2025-07-16T17:51:35-04:00", "duration_s": 1809.390676021576, "duration_min": 30.16, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 180.9390676021576, "pace_str": "3:01", "avg_hr": 121.6, "max_hr": 137, "kcal": 454.0, "strokes": 532, "cadence_spm": 17.6, "swolf": 58.5, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 22, "rank_duration": 26, "combined_rank": 48, "trimp": 232.5, "aerobic_eff": 0.273}, {"id": "C836DBDC-DDED-4F37-9C3B-8F0B7C9BBF77", "date": "2025-07-29", "weekday": "Tue", "start_time": "17:27", "timestamp": "2025-07-29T17:27:51-04:00", "duration_s": 1106.289065003395, "duration_min": 18.44, "distance_m": 600.0, "laps": 24, "pace_per_100m_s": 184.38151083389917, "pace_str": "3:04", "avg_hr": 122.4, "max_hr": 141, "kcal": 235.0, "strokes": 312, "cadence_spm": 16.9, "swolf": 59.1, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 50, "rank_duration": 51, "combined_rank": 101, "trimp": 146.1, "aerobic_eff": 0.266}, {"id": "A0AC57CA-523E-46B4-B94D-B9C58B522C34", "date": "2025-09-11", "weekday": "Thu", "start_time": "18:37", "timestamp": "2025-09-11T18:37:07-04:00", "duration_s": 1142.7971481084824, "duration_min": 19.05, "distance_m": 650.0, "laps": 26, "pace_per_100m_s": 175.81494586284344, "pace_str": "2:56", "avg_hr": 124.9, "max_hr": 142, "kcal": 230.0, "strokes": 298.0, "cadence_spm": 15.6, "swolf": 55.4, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 45, "rank_duration": 48, "combined_rank": 93, "trimp": 164.0, "aerobic_eff": 0.273}, {"id": "162A2195-38E9-4B39-8D72-0ADA1ED87153", "date": "2025-12-09", "weekday": "Tue", "start_time": "16:48", "timestamp": "2025-12-09T16:48:23-05:00", "duration_s": 1977.4018069505692, "duration_min": 32.96, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 197.74018069505692, "pace_str": "3:18", "avg_hr": 140.4, "max_hr": 162, "kcal": 370.0, "strokes": 520, "cadence_spm": 15.8, "swolf": 62.4, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 23, "rank_duration": 21, "combined_rank": 44, "trimp": 459.7, "aerobic_eff": 0.216}, {"id": "FFF8E83A-A92A-445E-BCD8-14330891E2EC", "date": "2025-12-11", "weekday": "Thu", "start_time": "16:53", "timestamp": "2025-12-11T16:53:44-05:00", "duration_s": 1470.8779859542847, "duration_min": 24.51, "distance_m": 750.0, "laps": 30, "pace_per_100m_s": 196.11706479390463, "pace_str": "3:16", "avg_hr": 147.0, "max_hr": 159, "kcal": 258.0, "strokes": 390.0, "cadence_spm": 15.9, "swolf": 62.0, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 38, "rank_duration": 36, "combined_rank": 74, "trimp": 413.9, "aerobic_eff": 0.208}, {"id": "95020E19-A891-4841-87CF-64B814FB8A6F", "date": "2025-12-23", "weekday": "Tue", "start_time": "16:32", "timestamp": "2025-12-23T16:32:24-05:00", "duration_s": 2197.9847580194473, "duration_min": 36.63, "distance_m": 1225.0, "laps": 49, "pace_per_100m_s": 179.427327185261, "pace_str": "2:59", "avg_hr": 145.9, "max_hr": 165, "kcal": 407.0, "strokes": 594, "cadence_spm": 16.2, "swolf": 57.0, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 13, "rank_duration": 15, "combined_rank": 28, "trimp": 599.5, "aerobic_eff": 0.229}, {"id": "372241B9-8C86-4363-90C0-EB2F79B923A2", "date": "2025-12-29", "weekday": "Mon", "start_time": "12:04", "timestamp": "2025-12-29T12:04:19-05:00", "duration_s": 2224.921550989151, "duration_min": 37.08, "distance_m": 1250.0, "laps": 50, "pace_per_100m_s": 177.99372407913208, "pace_str": "2:58", "avg_hr": 133.5, "max_hr": 159, "kcal": 434.0, "strokes": 631.0, "cadence_spm": 17.0, "swolf": 57.1, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 10, "rank_duration": 13, "combined_rank": 23, "trimp": 419.9, "aerobic_eff": 0.253}, {"id": "9E2245DD-A426-4832-B201-1CCB6E9C8078", "date": "2026-01-06", "weekday": "Tue", "start_time": "16:45", "timestamp": "2026-01-06T16:45:47-05:00", "duration_s": 2308.004149913788, "duration_min": 38.47, "distance_m": 1300.0, "laps": 52, "pace_per_100m_s": 177.53878076259906, "pace_str": "2:58", "avg_hr": 144.4, "max_hr": 169, "kcal": 411.0, "strokes": 588, "cadence_spm": 15.3, "swolf": 55.7, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 9, "rank_duration": 11, "combined_rank": 20, "trimp": 603.0, "aerobic_eff": 0.234}, {"id": "A85EE706-C29E-4353-9F49-4B7C286B81A1", "date": "2026-01-11", "weekday": "Sun", "start_time": "13:59", "timestamp": "2026-01-11T13:59:50-05:00", "duration_s": 1535.87366604805, "duration_min": 25.6, "distance_m": 800.0, "laps": 32, "pace_per_100m_s": 191.98420825600624, "pace_str": "3:12", "avg_hr": 123.3, "max_hr": 138, "kcal": 260.0, "strokes": 374, "cadence_spm": 14.6, "swolf": 59.7, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 34, "rank_duration": 32, "combined_rank": 66, "trimp": 209.0, "aerobic_eff": 0.253}, {"id": "43845D08-8618-447A-9C73-BAC18C678364", "date": "2026-01-13", "weekday": "Tue", "start_time": "17:04", "timestamp": "2026-01-13T17:04:17-05:00", "duration_s": 1800.9727889299393, "duration_min": 30.02, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 180.09727889299393, "pace_str": "3:00", "avg_hr": 151.2, "max_hr": 172, "kcal": 304.0, "strokes": 446, "cadence_spm": 14.9, "swolf": 56.2, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 24, "rank_duration": 27, "combined_rank": 51, "trimp": 570.6, "aerobic_eff": 0.22}, {"id": "4C4B9B27-732F-4603-842B-D50E625DE142", "date": "2026-01-27", "weekday": "Tue", "start_time": "16:56", "timestamp": "2026-01-27T16:56:27-05:00", "duration_s": 1839.9734179973602, "duration_min": 30.67, "distance_m": 875.0, "laps": 35, "pace_per_100m_s": 210.28267634255545, "pace_str": "3:30", "avg_hr": 142.5, "max_hr": 154, "kcal": 310.0, "strokes": 473.0, "cadence_spm": 15.4, "swolf": 66.1, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 27, "rank_duration": 24, "combined_rank": 51, "trimp": 455.0, "aerobic_eff": 0.2}, {"id": "FEF254D0-BCD8-4662-BCB0-CA335DEFAF41", "date": "2026-01-30", "weekday": "Fri", "start_time": "17:43", "timestamp": "2026-01-30T17:43:28-05:00", "duration_s": 1817.8851490020752, "duration_min": 30.3, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 181.78851490020753, "pace_str": "3:02", "avg_hr": 140.5, "max_hr": 155, "kcal": 317.0, "strokes": 478.0, "cadence_spm": 15.8, "swolf": 57.4, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 25, "rank_duration": 25, "combined_rank": 50, "trimp": 423.8, "aerobic_eff": 0.235}, {"id": "D33CB717-D16E-4EAE-9C8A-777E39BB0665", "date": "2026-02-03", "weekday": "Tue", "start_time": "16:57", "timestamp": "2026-02-03T16:57:14-05:00", "duration_s": 2121.4802869558334, "duration_min": 35.36, "distance_m": 1250.0, "laps": 50, "pace_per_100m_s": 169.71842295646667, "pace_str": "2:50", "avg_hr": 142.4, "max_hr": 161, "kcal": 396.0, "strokes": 613.0, "cadence_spm": 17.3, "swolf": 54.7, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 11, "rank_duration": 16, "combined_rank": 27, "trimp": 523.0, "aerobic_eff": 0.248}, {"id": "E892E7AB-E984-4FAE-BC99-26A37F59A784", "date": "2026-02-05", "weekday": "Thu", "start_time": "16:57", "timestamp": "2026-02-05T16:57:53-05:00", "duration_s": 2011.3849380016327, "duration_min": 33.52, "distance_m": 1050.0, "laps": 42, "pace_per_100m_s": 191.56047028586977, "pace_str": "3:12", "avg_hr": 140.9, "max_hr": 155, "kcal": 333.0, "strokes": 438.0, "cadence_spm": 13.1, "swolf": 58.3, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 18, "rank_duration": 19, "combined_rank": 37, "trimp": 474.4, "aerobic_eff": 0.222}, {"id": "1A040C9A-D509-45D5-8B81-CDAB0B109EDA", "date": "2026-02-10", "weekday": "Tue", "start_time": "17:00", "timestamp": "2026-02-10T17:00:08-05:00", "duration_s": 2204.0843609571457, "duration_min": 36.73, "distance_m": 1150.0, "laps": 46, "pace_per_100m_s": 191.65950964844745, "pace_str": "3:12", "avg_hr": 142.0, "max_hr": 161, "kcal": 401.0, "strokes": 541, "cadence_spm": 14.7, "swolf": 59.7, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 14, "rank_duration": 14, "combined_rank": 28, "trimp": 536.9, "aerobic_eff": 0.22}, {"id": "DA4DDEE8-904E-4620-9013-B0C1564928FB", "date": "2026-02-12", "weekday": "Thu", "start_time": "16:51", "timestamp": "2026-02-12T16:51:49-05:00", "duration_s": 2298.1462490558624, "duration_min": 38.3, "distance_m": 1250.0, "laps": 50, "pace_per_100m_s": 183.851699924469, "pace_str": "3:04", "avg_hr": 141.7, "max_hr": 166, "kcal": 430.0, "strokes": 618, "cadence_spm": 16.1, "swolf": 58.3, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 12, "rank_duration": 12, "combined_rank": 24, "trimp": 555.0, "aerobic_eff": 0.23}, {"id": "6FA06F1E-C481-46C6-946B-76BA0CD08B72", "date": "2026-02-19", "weekday": "Thu", "start_time": "16:50", "timestamp": "2026-02-19T16:50:21-05:00", "duration_s": 1170.4710010290146, "duration_min": 19.51, "distance_m": 650.0, "laps": 26, "pace_per_100m_s": 180.07246169677148, "pace_str": "3:00", "avg_hr": 133.4, "max_hr": 154, "kcal": 210.0, "strokes": 316, "cadence_spm": 16.2, "swolf": 57.2, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 46, "rank_duration": 46, "combined_rank": 92, "trimp": 220.3, "aerobic_eff": 0.25}, {"id": "10CC84DE-575B-4FF4-B448-CE0B27E006FE", "date": "2026-02-20", "weekday": "Fri", "start_time": "17:50", "timestamp": "2026-02-20T17:50:02-05:00", "duration_s": 2482.2207069396973, "duration_min": 41.37, "distance_m": 1400.0, "laps": 56, "pace_per_100m_s": 177.30147906712122, "pace_str": "2:57", "avg_hr": 139.1, "max_hr": 150, "kcal": 460.0, "strokes": 606, "cadence_spm": 14.6, "swolf": 55.1, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 8, "rank_duration": 9, "combined_rank": 17, "trimp": 555.2, "aerobic_eff": 0.243}, {"id": "329A927C-B6BE-4C50-AC25-F55AF790D331", "date": "2026-02-24", "weekday": "Tue", "start_time": "16:48", "timestamp": "2026-02-24T16:48:24-05:00", "duration_s": 2823.0811989307404, "duration_min": 47.05, "distance_m": 1675.0, "laps": 67, "pace_per_100m_s": 168.54216113019345, "pace_str": "2:49", "avg_hr": 144.4, "max_hr": 166, "kcal": 579.0, "strokes": 850, "cadence_spm": 18.1, "swolf": 54.8, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 6, "rank_duration": 7, "combined_rank": 13, "trimp": 737.5, "aerobic_eff": 0.247}, {"id": "45F3C7B5-C99D-45D2-8F39-F182063FD9BF", "date": "2026-03-01", "weekday": "Sun", "start_time": "11:50", "timestamp": "2026-03-01T11:50:22-05:00", "duration_s": 1418.740765929222, "duration_min": 23.65, "distance_m": 650.0, "laps": 26, "pace_per_100m_s": 218.26781014295725, "pace_str": "3:38", "avg_hr": 119.6, "max_hr": 150, "kcal": 209.0, "strokes": 322, "cadence_spm": 13.6, "swolf": 67.0, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 47, "rank_duration": 40, "combined_rank": 87, "trimp": 170.3, "aerobic_eff": 0.23}, {"id": "4AD6CC25-D588-4C22-A5D9-208677A159EC", "date": "2026-03-10", "weekday": "Tue", "start_time": "17:48", "timestamp": "2026-03-10T17:48:32-04:00", "duration_s": 1259.6848599910736, "duration_min": 20.99, "distance_m": 675.0, "laps": 27, "pace_per_100m_s": 186.61997925793682, "pace_str": "3:07", "avg_hr": 111.2, "max_hr": 118, "kcal": 213.0, "strokes": 278, "cadence_spm": 13.2, "swolf": 57.0, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 43, "rank_duration": 44, "combined_rank": 87, "trimp": 111.5, "aerobic_eff": 0.289}, {"id": "DAF5492A-BCFA-4A5B-BD36-73DB128D9BA6", "date": "2026-03-23", "weekday": "Mon", "start_time": "17:07", "timestamp": "2026-03-23T17:07:18-04:00", "duration_s": 2984.7518969774246, "duration_min": 49.75, "distance_m": 1750.0, "laps": 70, "pace_per_100m_s": 170.55725125585283, "pace_str": "2:51", "avg_hr": 125.0, "max_hr": 141, "kcal": 561.0, "strokes": 813.0, "cadence_spm": 16.3, "swolf": 54.3, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 4, "rank_duration": 5, "combined_rank": 9, "trimp": 429.8, "aerobic_eff": 0.281}, {"id": "73C78268-BFE8-438F-A7E4-95A5B58A957B", "date": "2026-03-27", "weekday": "Fri", "start_time": "13:41", "timestamp": "2026-03-27T13:41:50-04:00", "duration_s": 3486.6498180627823, "duration_min": 58.11, "distance_m": 1900.0, "laps": 76, "pace_per_100m_s": 183.50788516119906, "pace_str": "3:04", "avg_hr": 121.0, "max_hr": 137, "kcal": 718.0, "strokes": 1043, "cadence_spm": 17.9, "swolf": 59.6, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 3, "rank_duration": 3, "combined_rank": 6, "trimp": 439.0, "aerobic_eff": 0.27}, {"id": "A5B60D2E-F105-4F2F-AA36-CE4C542EE251", "date": "2026-04-04", "weekday": "Sat", "start_time": "10:15", "timestamp": "2026-04-04T10:15:59-04:00", "duration_s": 1491.5869400501251, "duration_min": 24.86, "distance_m": 800.0, "laps": 32, "pace_per_100m_s": 186.44836750626564, "pace_str": "3:06", "avg_hr": 130.2, "max_hr": 155, "kcal": 273.0, "strokes": 368.0, "cadence_spm": 14.8, "swolf": 58.1, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 35, "rank_duration": 34, "combined_rank": 69, "trimp": 254.0, "aerobic_eff": 0.247}, {"id": "0DC23F1C-7BFF-47E1-A17E-CA230C69D89B", "date": "2026-04-08", "weekday": "Wed", "start_time": "14:38", "timestamp": "2026-04-08T14:38:09-04:00", "duration_s": 833.1830580234528, "duration_min": 13.89, "distance_m": 350.0, "laps": 14, "pace_per_100m_s": 238.05230229241508, "pace_str": "3:58", "avg_hr": 123.7, "max_hr": 144, "kcal": 107.0, "strokes": 154, "cadence_spm": 11.1, "swolf": 70.5, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 58, "rank_duration": 58, "combined_rank": 116, "trimp": 114.9, "aerobic_eff": 0.204}, {"id": "3C14992B-C07C-442C-8611-6775E3C4BE80", "date": "2026-04-10", "weekday": "Fri", "start_time": "14:00", "timestamp": "2026-04-10T14:00:26-04:00", "duration_s": 1734.825248003006, "duration_min": 28.91, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 173.4825248003006, "pace_str": "2:53", "avg_hr": 133.6, "max_hr": 148, "kcal": 353.0, "strokes": 499, "cadence_spm": 17.3, "swolf": 55.8, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 26, "rank_duration": 28, "combined_rank": 54, "trimp": 328.4, "aerobic_eff": 0.259}, {"id": "6CE9F2DD-8264-4072-93D6-92EC836F87EE", "date": "2026-04-16", "weekday": "Thu", "start_time": "18:25", "timestamp": "2026-04-16T18:25:33-04:00", "duration_s": 1875.4571739435196, "duration_min": 31.26, "distance_m": 1050.0, "laps": 42, "pace_per_100m_s": 178.61496894700187, "pace_str": "2:59", "avg_hr": 136.6, "max_hr": 153, "kcal": 336.0, "strokes": 494.0, "cadence_spm": 15.8, "swolf": 56.4, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 19, "rank_duration": 23, "combined_rank": 42, "trimp": 389.2, "aerobic_eff": 0.246}, {"id": "APR18-2026-LONG-WEEK1-0001", "date": "2026-04-18", "weekday": "Sat", "start_time": "09:14", "timestamp": "2026-04-18T09:14:45-04:00", "duration_s": 3797.0874940156937, "duration_min": 63.28, "distance_m": 2050.0, "laps": 82, "pace_per_100m_s": 185.2238, "pace_str": "3:05", "avg_hr": 121.0, "max_hr": 152, "kcal": 702.0, "strokes": 1065, "cadence_spm": 16.8, "swolf": 59.3, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 2, "rank_duration": 1, "combined_rank": 3, "trimp": 478.1, "aerobic_eff": 0.268}, {"id": "APR20-2026-TECH-WEEK2-0001", "date": "2026-04-20", "weekday": "Mon", "start_time": "17:43", "timestamp": "2026-04-20T17:43:30-04:00", "duration_s": 3684.8175250291824, "duration_min": 61.41, "distance_m": 2125.0, "laps": 85, "pace_per_100m_s": 173.4, "pace_str": "2:53", "avg_hr": 136.0, "max_hr": 158, "kcal": 701.35, "strokes": 1070, "cadence_spm": 17.4, "swolf": 55.9, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 1, "rank_duration": 2, "combined_rank": 3, "trimp": 750.8, "aerobic_eff": 0.254}, {"id": "APR23-2026-RECOV-WEEK2-0001", "date": "2026-04-23", "weekday": "Thu", "start_time": "17:23", "timestamp": "2026-04-23T17:23:49-04:00", "duration_s": 2089.4564419984818, "duration_min": 34.82, "distance_m": 1100.0, "laps": 44, "pace_per_100m_s": 189.95, "pace_str": "3:10", "avg_hr": 139.0, "max_hr": 164, "kcal": 364.46, "strokes": 566, "cadence_spm": 16.3, "swolf": 60.4, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 16, "rank_duration": 18, "combined_rank": 34, "trimp": 465.9, "aerobic_eff": 0.227}];
-var TOP5 = new Set([60, 61, 55, 54, 30]);
-var PHYS = {"hrv": [["2026-01-26", 26.7], ["2026-01-27", 21.7], ["2026-01-28", 20.0], ["2026-01-29", 32.9], ["2026-01-30", 16.1], ["2026-01-31", 36.2], ["2026-02-01", 27.6], ["2026-02-02", 28.8], ["2026-02-03", 18.0], ["2026-02-04", 27.6], ["2026-02-05", 31.4], ["2026-02-06", 22.1], ["2026-02-07", 33.8], ["2026-02-08", 37.1], ["2026-02-09", 27.3], ["2026-02-10", 22.9], ["2026-02-11", 25.0], ["2026-02-12", 23.9], ["2026-02-13", 20.8], ["2026-02-14", 22.8], ["2026-02-15", 29.0], ["2026-02-16", 23.5], ["2026-02-17", 21.0], ["2026-02-18", 22.4], ["2026-02-19", 20.6], ["2026-02-20", 24.6], ["2026-02-21", 17.1], ["2026-02-22", 22.0], ["2026-02-23", 26.8], ["2026-02-24", 30.2], ["2026-02-25", 26.1], ["2026-02-26", 24.0], ["2026-02-27", 28.0], ["2026-02-28", 25.7], ["2026-03-01", 25.7], ["2026-03-03", 33.0], ["2026-03-04", 35.2], ["2026-03-05", 33.3], ["2026-03-06", 34.1], ["2026-03-07", 26.6], ["2026-03-08", 26.3], ["2026-03-09", 41.4], ["2026-03-10", 33.4], ["2026-03-11", 34.7], ["2026-03-12", 33.2], ["2026-03-13", 29.3], ["2026-03-14", 33.5], ["2026-03-15", 25.9], ["2026-03-16", 37.7], ["2026-03-17", 30.8], ["2026-03-18", 46.1], ["2026-03-19", 38.5], ["2026-03-20", 17.9], ["2026-03-21", 28.7], ["2026-03-22", 40.3], ["2026-03-23", 34.5], ["2026-03-24", 29.0], ["2026-03-25", 28.5], ["2026-03-26", 16.2], ["2026-03-27", 32.5], ["2026-03-28", 24.9], ["2026-03-29", 27.4], ["2026-03-30", 38.9], ["2026-03-31", 39.5], ["2026-04-01", 24.2], ["2026-04-02", 35.2], ["2026-04-03", 28.7], ["2026-04-04", 16.6], ["2026-04-05", 31.8], ["2026-04-06", 24.6], ["2026-04-07", 29.1], ["2026-04-08", 24.3], ["2026-04-09", 36.9], ["2026-04-10", 21.2], ["2026-04-11", 24.1], ["2026-04-12", 30.0], ["2026-04-13", 20.3], ["2026-04-14", 29.6], ["2026-04-15", 31.7], ["2026-04-16", 32.2], ["2026-04-17", 24.5], ["2026-04-18", 20.5], ["2026-04-19", 29.5], ["2026-04-20", 33.2], ["2026-04-21", 31.4], ["2026-04-22", 31.2], ["2026-04-23", 28.1], ["2026-04-24", 43.8]], "rhr": [["2026-01-26", 59], ["2026-01-27", 66], ["2026-01-28", 71], ["2026-01-29", 69], ["2026-01-30", 67], ["2026-01-31", 69], ["2026-02-01", 71], ["2026-02-02", 70], ["2026-02-03", 79], ["2026-02-04", 66], ["2026-02-05", 70], ["2026-02-06", 67], ["2026-02-07", 74], ["2026-02-08", 72], ["2026-02-09", 71], ["2026-02-10", 66], ["2026-02-11", 68], ["2026-02-12", 72], ["2026-02-13", 69], ["2026-02-14", 80], ["2026-02-15", 70], ["2026-02-16", 74], ["2026-02-17", 67], ["2026-02-18", 79], ["2026-02-19", 82], ["2026-02-20", 73], ["2026-02-21", 76], ["2026-02-22", 67], ["2026-02-23", 65], ["2026-02-24", 68], ["2026-02-25", 75], ["2026-02-26", 70], ["2026-02-27", 59], ["2026-02-28", 70], ["2026-03-01", 73], ["2026-03-03", 67], ["2026-03-04", 63], ["2026-03-05", 70], ["2026-03-06", 64], ["2026-03-07", 71], ["2026-03-08", 74], ["2026-03-09", 60], ["2026-03-10", 62], ["2026-03-11", 70], ["2026-03-12", 66], ["2026-03-13", 72], ["2026-03-14", 69], ["2026-03-15", 71], ["2026-03-16", 63], ["2026-03-17", 66], ["2026-03-18", 58], ["2026-03-19", 66], ["2026-03-20", 81], ["2026-03-21", 67], ["2026-03-22", 64], ["2026-03-23", 61], ["2026-03-24", 64], ["2026-03-25", 71], ["2026-03-26", 84], ["2026-03-27", 72], ["2026-03-28", 73], ["2026-03-29", 70], ["2026-03-30", 56], ["2026-03-31", 63], ["2026-04-01", 70], ["2026-04-02", 68], ["2026-04-03", 81], ["2026-04-04", 86], ["2026-04-05", 65], ["2026-04-06", 72], ["2026-04-07", 67], ["2026-04-08", 74], ["2026-04-09", 66], ["2026-04-10", 67], ["2026-04-11", 67], ["2026-04-12", 71], ["2026-04-13", 90], ["2026-04-14", 71], ["2026-04-15", 72], ["2026-04-16", 72], ["2026-04-17", 68], ["2026-04-18", 80], ["2026-04-19", 66], ["2026-04-20", 60], ["2026-04-21", 67], ["2026-04-22", 68], ["2026-04-23", 67], ["2026-04-24", 71]], "vo2": [["2025-10-27", 35.52], ["2025-11-03", 36.28], ["2025-11-10", 36.31], ["2025-11-24", 36.61], ["2025-12-01", 36.0], ["2025-12-08", 35.01], ["2025-12-15", 34.92], ["2026-01-12", 34.96], ["2026-01-19", 35.34], ["2026-02-16", 34.91], ["2026-03-02", 35.45], ["2026-03-09", 37.49], ["2026-03-16", 38.16], ["2026-03-30", 39.04], ["2026-04-20", 39.09]], "walking_hr": [["2026-01-26", 93.7], ["2026-02-02", 91.0], ["2026-02-09", 93.0], ["2026-02-16", 100.0], ["2026-02-23", 92.4], ["2026-03-02", 96.4], ["2026-03-09", 97.3], ["2026-03-16", 89.0], ["2026-03-23", 94.6], ["2026-03-30", 89.1], ["2026-04-06", 98.1], ["2026-04-13", 96.6], ["2026-04-20", 94.0]], "spo2": [["2026-03-24", 97.5], ["2026-03-25", 98.0], ["2026-03-26", 97.0], ["2026-03-27", 95.5], ["2026-03-28", 97.0], ["2026-03-29", 98.0], ["2026-03-30", 97.3], ["2026-03-31", 98.0], ["2026-04-01", 97.0], ["2026-04-02", 97.0], ["2026-04-04", 96.0], ["2026-04-05", 97.0], ["2026-04-06", 98.7], ["2026-04-07", 98.2], ["2026-04-08", 96.2], ["2026-04-09", 97.8], ["2026-04-10", 98.0], ["2026-04-11", 97.7], ["2026-04-12", 96.5], ["2026-04-13", 93.0], ["2026-04-14", 98.0], ["2026-04-15", 96.7], ["2026-04-16", 95.4], ["2026-04-17", 97.7], ["2026-04-18", 97.8], ["2026-04-19", 98.0], ["2026-04-20", 98.5], ["2026-04-21", 98.0], ["2026-04-23", 98.0], ["2026-04-24", 98.5]], "hrv_mean": 28.4, "hrv_recent_7": 31.1, "rhr_mean": 69.6, "rhr_recent_7": 68.4, "vo2_latest": 39.09, "vo2_change_6mo": 3.57, "atl": 164.9, "ctl": 91.4, "tsb": -73.5, "acwr": 1.8, "load_dates": ["2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-11", "2026-04-12", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-18", "2026-04-19", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24"], "load_atl": [93.6, 81.2, 70.4, 130.6, 113.2, 161.3, 139.8, 121.2, 105.1, 91.1, 150.4, 130.4, 186.9, 162.1, 140.5, 121.8, 105.6, 91.5, 79.3, 98.1, 158.9, 137.8, 119.4, 103.5, 187.9, 162.9, 141.2, 122.4, 106.1, 114.7, 99.4, 86.2, 74.7, 64.8, 56.1, 48.7, 42.2, 36.6, 46.5, 40.3, 35.0, 30.3, 26.3, 22.8, 19.8, 17.1, 14.8, 12.9, 11.2, 9.7, 8.4, 64.5, 55.9, 48.5, 42.0, 94.9, 82.2, 71.3, 61.8, 53.6, 46.4, 40.3, 34.9, 64.1, 55.5, 48.1, 41.7, 51.5, 44.6, 82.4, 71.4, 61.9, 53.7, 46.5, 40.3, 86.8, 75.2, 128.9, 111.7, 196.8, 170.6, 147.9, 190.2, 164.9], "load_ctl": [55.7, 54.4, 53.1, 64.1, 62.6, 72.3, 70.6, 69.0, 67.3, 65.8, 76.8, 75.0, 86.3, 84.3, 82.3, 80.4, 78.5, 76.6, 74.8, 78.3, 89.5, 87.4, 85.3, 83.3, 98.7, 96.4, 94.1, 91.9, 89.7, 91.6, 89.5, 87.4, 85.3, 83.3, 81.3, 79.4, 77.6, 75.7, 76.6, 74.8, 73.0, 71.3, 69.6, 68.0, 66.4, 64.8, 63.3, 61.8, 60.4, 58.9, 57.5, 66.3, 64.7, 63.2, 61.7, 70.6, 69.0, 67.3, 65.7, 64.2, 62.7, 61.2, 59.8, 64.3, 62.8, 61.3, 59.9, 61.2, 59.8, 66.1, 64.5, 63.0, 61.5, 60.1, 58.7, 66.4, 64.9, 74.6, 72.8, 88.8, 86.7, 84.7, 93.6, 91.4], "load_tsb": [-38.0, -26.8, -17.3, -66.5, -50.6, -89.0, -69.2, -52.3, -37.7, -25.3, -73.6, -55.4, -100.6, -77.8, -58.2, -41.4, -27.1, -14.9, -4.5, -19.8, -69.5, -50.4, -34.1, -20.2, -89.2, -66.5, -47.1, -30.5, -16.4, -23.0, -9.9, 1.2, 10.6, 18.5, 25.2, 30.8, 35.4, 39.2, 30.0, 34.4, 38.0, 41.0, 43.3, 45.2, 46.6, 47.7, 48.5, 48.9, 49.2, 49.3, 49.2, 1.8, 8.8, 14.8, 19.7, -24.2, -13.3, -4.0, 4.0, 10.6, 16.3, 21.0, 24.9, 0.3, 7.3, 13.2, 18.2, 9.7, 15.1, -16.3, -6.9, 1.1, 7.8, 13.5, 18.3, -20.3, -10.3, -54.3, -38.9, -108.0, -83.9, -63.2, -96.6, -73.5], "load_daily": [0.0, 0.0, 0.0, 523.0, 0.0, 474.4, 0.0, 0.0, 0.0, 0.0, 536.9, 0.0, 555.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 220.3, 555.2, 0.0, 0.0, 0.0, 737.5, 0.0, 0.0, 0.0, 0.0, 170.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 111.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 429.8, 0.0, 0.0, 0.0, 439.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 254.0, 0.0, 0.0, 0.0, 114.9, 0.0, 328.4, 0.0, 0.0, 0.0, 0.0, 0.0, 389.2, 0.0, 478.1, 0.0, 750.8, 0.0, 0.0, 465.9, 0.0], "weekly_vol": [{"week": "2025-12-08", "dist": 1750, "ct": 2}, {"week": "2025-12-22", "dist": 1225, "ct": 1}, {"week": "2025-12-29", "dist": 1250, "ct": 1}, {"week": "2026-01-05", "dist": 2100, "ct": 2}, {"week": "2026-01-12", "dist": 1000, "ct": 1}, {"week": "2026-01-26", "dist": 1875, "ct": 2}, {"week": "2026-02-02", "dist": 2300, "ct": 2}, {"week": "2026-02-09", "dist": 2400, "ct": 2}, {"week": "2026-02-16", "dist": 2050, "ct": 2}, {"week": "2026-02-23", "dist": 2325, "ct": 2}, {"week": "2026-03-09", "dist": 675, "ct": 1}, {"week": "2026-03-23", "dist": 3650, "ct": 2}, {"week": "2026-03-30", "dist": 800, "ct": 1}, {"week": "2026-04-06", "dist": 1350, "ct": 2}, {"week": "2026-04-13", "dist": 3100, "ct": 2}, {"week": "2026-04-20", "dist": 3225, "ct": 2}]};
+const SESSIONS = [{"id": "898985E9-AB1E-4207-B47C-1F247E59B517", "date": "2024-07-01", "weekday": "Mon", "start_time": "13:35", "timestamp": "2024-07-01T13:35:11-04:00", "duration_s": 579.2182480096817, "duration_min": 9.65, "distance_m": 325.0, "laps": 13, "pace_per_100m_s": 178.22099938759436, "pace_str": "2:58", "avg_hr": 107.6, "max_hr": 117, "kcal": 88.0, "strokes": 118, "cadence_spm": 12.2, "swolf": 53.6, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 57, "rank_duration": 58, "combined_rank": 115}, {"id": "8C125DFD-D347-434E-9109-3025A1E972C8", "date": "2024-07-01", "weekday": "Mon", "start_time": "17:13", "timestamp": "2024-07-01T17:13:46-04:00", "duration_s": 2334.192061662674, "duration_min": 38.9, "distance_m": 550.0, "laps": 22, "pace_per_100m_s": 424.3985566659407, "pace_str": "7:04", "avg_hr": 91.8, "max_hr": 108, "kcal": 140.0, "strokes": 135, "cadence_spm": 3.5, "swolf": 112.2, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 51, "rank_duration": 9, "combined_rank": 60}, {"id": "F79CC8E6-A3E1-47A3-9C60-9DDEBCD747A6", "date": "2024-07-04", "weekday": "Thu", "start_time": "10:51", "timestamp": "2024-07-04T10:51:55-04:00", "duration_s": 160.75665390491486, "duration_min": 2.68, "distance_m": 125.0, "laps": 5, "pace_per_100m_s": 128.6053231239319, "pace_str": "2:09", "avg_hr": 113.4, "max_hr": 115, "kcal": 28.0, "strokes": 40, "cadence_spm": 14.9, "swolf": 40.2, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 60, "rank_duration": 61, "combined_rank": 121}, {"id": "D95ABA3B-1FAB-40A6-B8B4-F7A497D40F3D", "date": "2024-07-04", "weekday": "Thu", "start_time": "11:12", "timestamp": "2024-07-04T11:12:27-04:00", "duration_s": 960.8409949541092, "duration_min": 16.01, "distance_m": 450.0, "laps": 18, "pace_per_100m_s": 213.52022110091315, "pace_str": "3:34", "avg_hr": 115.5, "max_hr": 136, "kcal": 135.0, "strokes": 196, "cadence_spm": 12.2, "swolf": 64.3, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 53, "rank_duration": 53, "combined_rank": 106}, {"id": "6F2A4902-A6F1-4C37-915D-3B839F1D7299", "date": "2024-07-04", "weekday": "Thu", "start_time": "17:07", "timestamp": "2024-07-04T17:07:51-04:00", "duration_s": 841.801741361618, "duration_min": 14.03, "distance_m": 225.0, "laps": 9, "pace_per_100m_s": 374.13410727183026, "pace_str": "6:14", "avg_hr": 97.2, "max_hr": 104, "kcal": 132.0, "strokes": 140, "cadence_spm": 10.0, "swolf": 109.1, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 58, "rank_duration": 55, "combined_rank": 113}, {"id": "405166A9-DF48-4358-98AB-903E26703D67", "date": "2024-07-05", "weekday": "Fri", "start_time": "13:49", "timestamp": "2024-07-05T13:49:31-04:00", "duration_s": 1061.673371911049, "duration_min": 17.69, "distance_m": 725.0, "laps": 29, "pace_per_100m_s": 146.4377064704895, "pace_str": "2:26", "avg_hr": 113.7, "max_hr": 128, "kcal": 205.0, "strokes": 298, "cadence_spm": 16.8, "swolf": 46.9, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 37, "rank_duration": 51, "combined_rank": 88}, {"id": "14CD4352-3BA7-4DC8-91FC-DA9792CCB45A", "date": "2024-07-06", "weekday": "Sat", "start_time": "13:46", "timestamp": "2024-07-06T13:46:06-04:00", "duration_s": 520.36445915699, "duration_min": 8.67, "distance_m": 225.0, "laps": 9, "pace_per_100m_s": 231.27309295866223, "pace_str": "3:51", "avg_hr": 103.7, "max_hr": 110, "kcal": 58.0, "strokes": 66, "cadence_spm": 7.6, "swolf": 65.2, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 59, "rank_duration": 59, "combined_rank": 118}, {"id": "2968B0E3-33E0-4DEA-BB45-FDF50AC6C81A", "date": "2024-07-10", "weekday": "Wed", "start_time": "15:12", "timestamp": "2024-07-10T15:12:31-04:00", "duration_s": 1157.7729510068893, "duration_min": 19.3, "distance_m": 800.0, "laps": 32, "pace_per_100m_s": 144.72161887586117, "pace_str": "2:25", "avg_hr": 100.2, "max_hr": 105, "kcal": 145.0, "strokes": 217, "cadence_spm": 11.2, "swolf": 43.0, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 30, "rank_duration": 45, "combined_rank": 75}, {"id": "AA51B2BD-4778-4B93-9BBC-235B00467019", "date": "2024-07-11", "weekday": "Thu", "start_time": "12:16", "timestamp": "2024-07-11T12:16:09-04:00", "duration_s": 1419.2085679769516, "duration_min": 23.65, "distance_m": 825.0, "laps": 33, "pace_per_100m_s": 172.0252809669032, "pace_str": "2:52", "avg_hr": 103.7, "max_hr": 118, "kcal": 206.0, "strokes": 264, "cadence_spm": 11.2, "swolf": 51.0, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 28, "rank_duration": 37, "combined_rank": 65}, {"id": "1C0CC8A9-DCAC-4526-9D8B-A44466C89ED0", "date": "2024-07-17", "weekday": "Wed", "start_time": "16:28", "timestamp": "2024-07-17T16:28:52-04:00", "duration_s": 318.7450909614563, "duration_min": 5.31, "distance_m": 100.0, "laps": 4, "pace_per_100m_s": 318.7450909614563, "pace_str": "5:19", "avg_hr": 113.6, "max_hr": 124.0, "kcal": 37.0, "strokes": 53, "cadence_spm": 10.0, "swolf": 92.9, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 61, "rank_duration": 60, "combined_rank": 121}, {"id": "1687D24C-DB9A-4C55-A485-7360E7C84013", "date": "2024-07-17", "weekday": "Wed", "start_time": "16:34", "timestamp": "2024-07-17T16:34:23-04:00", "duration_s": 763.7891209125519, "duration_min": 12.73, "distance_m": 350.0, "laps": 14, "pace_per_100m_s": 218.22546311787195, "pace_str": "3:38", "avg_hr": 121.4, "max_hr": 138, "kcal": 139.0, "strokes": 198, "cadence_spm": 15.6, "swolf": 68.7, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 54, "rank_duration": 57, "combined_rank": 111}, {"id": "6926A5F8-D7E6-42AA-B882-C0F0C3B1F948", "date": "2024-07-22", "weekday": "Mon", "start_time": "16:08", "timestamp": "2024-07-22T16:08:49-04:00", "duration_s": 938.8391319513321, "duration_min": 15.65, "distance_m": 500.0, "laps": 20, "pace_per_100m_s": 187.7678263902664, "pace_str": "3:08", "avg_hr": 121.7, "max_hr": 147, "kcal": 204.0, "strokes": 285, "cadence_spm": 18.2, "swolf": 61.2, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 52, "rank_duration": 54, "combined_rank": 106}, {"id": "05B7C933-1005-4F25-98CC-5A685DAC63E3", "date": "2024-07-24", "weekday": "Wed", "start_time": "17:33", "timestamp": "2024-07-24T17:33:50-04:00", "duration_s": 1067.8307819366455, "duration_min": 17.8, "distance_m": 600.0, "laps": 24, "pace_per_100m_s": 177.97179698944092, "pace_str": "2:58", "avg_hr": 123.6, "max_hr": 150, "kcal": 210.0, "strokes": 289.0, "cadence_spm": 16.2, "swolf": 56.5, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 46, "rank_duration": 50, "combined_rank": 96}, {"id": "673514C5-CDA0-4E2B-AC08-CA720E1DB8A5", "date": "2024-07-27", "weekday": "Sat", "start_time": "11:07", "timestamp": "2024-07-27T11:07:39-04:00", "duration_s": 1119.6321210861206, "duration_min": 18.66, "distance_m": 575.0, "laps": 23, "pace_per_100m_s": 194.71862975410792, "pace_str": "3:15", "avg_hr": 132.5, "max_hr": 149, "kcal": 224.0, "strokes": 321, "cadence_spm": 17.2, "swolf": 62.6, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 49, "rank_duration": 47, "combined_rank": 96}, {"id": "5ECBEC88-C2D5-4661-890E-4201B69713D5", "date": "2024-07-29", "weekday": "Mon", "start_time": "16:18", "timestamp": "2024-07-29T16:18:04-04:00", "duration_s": 1272.7534749507904, "duration_min": 21.21, "distance_m": 700.0, "laps": 28, "pace_per_100m_s": 181.82192499297005, "pace_str": "3:02", "avg_hr": 134.8, "max_hr": 165, "kcal": 277.0, "strokes": 412.0, "cadence_spm": 19.4, "swolf": 60.2, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 38, "rank_duration": 41, "combined_rank": 79}, {"id": "5E5C333F-DBBE-454D-8956-8680D0EF9699", "date": "2024-08-01", "weekday": "Thu", "start_time": "17:25", "timestamp": "2024-08-01T17:25:26-04:00", "duration_s": 1025.6614019870758, "duration_min": 17.09, "distance_m": 575.0, "laps": 23, "pace_per_100m_s": 178.3758959977523, "pace_str": "2:58", "avg_hr": 139.8, "max_hr": 160, "kcal": 232.0, "strokes": 336, "cadence_spm": 19.7, "swolf": 59.2, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 50, "rank_duration": 52, "combined_rank": 102}, {"id": "1C4E600B-2220-428A-B3E3-B67BB12400C5", "date": "2024-08-07", "weekday": "Wed", "start_time": "16:21", "timestamp": "2024-08-07T16:21:42-04:00", "duration_s": 1441.5310579538345, "duration_min": 24.03, "distance_m": 750.0, "laps": 30, "pace_per_100m_s": 192.20414106051126, "pace_str": "3:12", "avg_hr": 123.2, "max_hr": 135, "kcal": 298.0, "strokes": 421.0, "cadence_spm": 17.5, "swolf": 62.1, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 34, "rank_duration": 35, "combined_rank": 69}, {"id": "6547F019-3859-48BD-939A-55A9D1A14BB4", "date": "2024-08-12", "weekday": "Mon", "start_time": "17:52", "timestamp": "2024-08-12T17:52:57-04:00", "duration_s": 1110.1267020702362, "duration_min": 18.5, "distance_m": 600.0, "laps": 24, "pace_per_100m_s": 185.02111701170602, "pace_str": "3:05", "avg_hr": 134.6, "max_hr": 151, "kcal": 195.0, "strokes": 209, "cadence_spm": 11.3, "swolf": 55.0, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 47, "rank_duration": 48, "combined_rank": 95}, {"id": "66C0640C-EEAC-405D-BED7-A63917D9C6BC", "date": "2024-09-01", "weekday": "Sun", "start_time": "11:34", "timestamp": "2024-09-01T11:34:56-04:00", "duration_s": 1946.4711220264435, "duration_min": 32.44, "distance_m": 1100.0, "laps": 44, "pace_per_100m_s": 176.95192018422213, "pace_str": "2:57", "avg_hr": 124.4, "max_hr": 145, "kcal": 402.0, "strokes": 542, "cadence_spm": 16.7, "swolf": 56.6, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 14, "rank_duration": 20, "combined_rank": 34}, {"id": "53FFA8B8-F8D3-4608-B542-5045F8DBE26D", "date": "2024-09-21", "weekday": "Sat", "start_time": "09:04", "timestamp": "2024-09-21T09:04:27-04:00", "duration_s": 2119.661535024643, "duration_min": 35.33, "distance_m": 1051.6, "laps": 42, "pace_per_100m_s": 201.5730418074717, "pace_str": "3:22", "avg_hr": 122.1, "max_hr": 137, "kcal": 395.0, "strokes": 393.0, "cadence_spm": 11.1, "swolf": 59.8, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 15, "rank_duration": 16, "combined_rank": 31}, {"id": "A7F51500-54A7-4BE7-AB49-26D79EA99B75", "date": "2024-09-28", "weekday": "Sat", "start_time": "09:06", "timestamp": "2024-09-28T09:06:31-04:00", "duration_s": 1473.515014052391, "duration_min": 24.56, "distance_m": 800.0, "laps": 32, "pace_per_100m_s": 184.18937675654888, "pace_str": "3:04", "avg_hr": 122.3, "max_hr": 139.0, "kcal": 256.0, "strokes": 303.0, "cadence_spm": 12.3, "swolf": 55.5, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 31, "rank_duration": 33, "combined_rank": 64}, {"id": "A21093CD-FA91-47FE-901C-9C0EBA52C8A7", "date": "2024-09-30", "weekday": "Mon", "start_time": "13:30", "timestamp": "2024-09-30T13:30:02-04:00", "duration_s": 1529.59896504879, "duration_min": 25.49, "distance_m": 850.0, "laps": 34, "pace_per_100m_s": 179.9528194175047, "pace_str": "3:00", "avg_hr": 129.6, "max_hr": 149, "kcal": 296.0, "strokes": 348.0, "cadence_spm": 13.7, "swolf": 55.2, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 26, "rank_duration": 31, "combined_rank": 57}, {"id": "8996468F-42B2-464F-B681-E763132AD2B9", "date": "2024-10-03", "weekday": "Thu", "start_time": "12:31", "timestamp": "2024-10-03T12:31:46-04:00", "duration_s": 1334.994518995285, "duration_min": 22.25, "distance_m": 700.0, "laps": 28, "pace_per_100m_s": 190.71350271361214, "pace_str": "3:11", "avg_hr": 120.4, "max_hr": 135, "kcal": 246.0, "strokes": 319, "cadence_spm": 14.3, "swolf": 59.1, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 39, "rank_duration": 40, "combined_rank": 79}, {"id": "66802C4B-6EE6-448E-A6E9-AA6EA42D4DBF", "date": "2024-11-01", "weekday": "Fri", "start_time": "15:37", "timestamp": "2024-11-01T15:37:17-04:00", "duration_s": 1413.9027750492096, "duration_min": 23.57, "distance_m": 700.0, "laps": 28, "pace_per_100m_s": 201.98611072131567, "pace_str": "3:22", "avg_hr": 115.9, "max_hr": 130, "kcal": 236.0, "strokes": 343.0, "cadence_spm": 14.6, "swolf": 62.7, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 40, "rank_duration": 39, "combined_rank": 79}, {"id": "8AC445F8-EB70-414E-8920-6CD0B6A37E72", "date": "2025-02-09", "weekday": "Sun", "start_time": "11:03", "timestamp": "2025-02-09T11:03:37-05:00", "duration_s": 2508.0520960092545, "duration_min": 41.8, "distance_m": 350.0, "laps": 14, "pace_per_100m_s": 716.5863131455013, "pace_str": "11:57", "avg_hr": 94.8, "max_hr": 125.0, "kcal": 173.0, "strokes": 178.0, "cadence_spm": 4.3, "swolf": 191.9, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 55, "rank_duration": 7, "combined_rank": 62}, {"id": "DDE88828-8056-4D15-B636-2EDF34CAD688", "date": "2025-02-28", "weekday": "Fri", "start_time": "14:28", "timestamp": "2025-02-28T14:28:34-05:00", "duration_s": 1224.974315047264, "duration_min": 20.42, "distance_m": 650.0, "laps": 26, "pace_per_100m_s": 188.45758693034833, "pace_str": "3:08", "avg_hr": 121.0, "max_hr": 140, "kcal": 215.0, "strokes": 299, "cadence_spm": 14.6, "swolf": 58.6, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 42, "rank_duration": 43, "combined_rank": 85}, {"id": "2CD6AAD6-F263-42AB-BA4E-A8C764D9E0B3", "date": "2025-06-20", "weekday": "Fri", "start_time": "18:35", "timestamp": "2025-06-20T18:35:00-04:00", "duration_s": 1668.9431639909744, "duration_min": 27.82, "distance_m": 750.0, "laps": 30, "pace_per_100m_s": 222.5257551987966, "pace_str": "3:43", "avg_hr": 133.8, "max_hr": 160, "kcal": 199.0, "strokes": 342, "cadence_spm": 12.3, "swolf": 67.0, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 35, "rank_duration": 28, "combined_rank": 63}, {"id": "C60F48EB-486A-4A73-969E-1CFF1235883C", "date": "2025-06-25", "weekday": "Wed", "start_time": "18:31", "timestamp": "2025-06-25T18:31:43-04:00", "duration_s": 1424.4602440595627, "duration_min": 23.74, "distance_m": 825.0, "laps": 33, "pace_per_100m_s": 172.66184776479548, "pace_str": "2:53", "avg_hr": 128.4, "max_hr": 145, "kcal": 310.0, "strokes": 347, "cadence_spm": 14.6, "swolf": 53.7, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 29, "rank_duration": 36, "combined_rank": 65}, {"id": "01590AD8-99B7-4855-88DA-70C95FF8E95D", "date": "2025-06-26", "weekday": "Thu", "start_time": "17:30", "timestamp": "2025-06-26T17:30:24-04:00", "duration_s": 1667.096566915512, "duration_min": 27.78, "distance_m": 850.0, "laps": 34, "pace_per_100m_s": 196.12900787241318, "pace_str": "3:16", "avg_hr": 133.3, "max_hr": 148, "kcal": 374.0, "strokes": 448.0, "cadence_spm": 16.1, "swolf": 62.2, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 27, "rank_duration": 29, "combined_rank": 56}, {"id": "65C85E43-B0F8-49D1-ABCF-0414A1176F6F", "date": "2025-06-29", "weekday": "Sun", "start_time": "15:21", "timestamp": "2025-06-29T15:21:09-04:00", "duration_s": 2000.5646579265594, "duration_min": 33.34, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 200.05646579265596, "pace_str": "3:20", "avg_hr": 122.8, "max_hr": 134, "kcal": 480.0, "strokes": 574, "cadence_spm": 17.2, "swolf": 64.4, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 18, "rank_duration": 18, "combined_rank": 36}, {"id": "18FC9541-EAFC-4276-B122-D3B8A05C1728", "date": "2025-06-30", "weekday": "Mon", "start_time": "17:26", "timestamp": "2025-06-30T17:26:39-04:00", "duration_s": 3036.7860530614853, "duration_min": 50.61, "distance_m": 1650.0, "laps": 66, "pace_per_100m_s": 184.04763957948396, "pace_str": "3:04", "avg_hr": 132.4, "max_hr": 154.0, "kcal": 797.0, "strokes": 1021.0, "cadence_spm": 20.2, "swolf": 61.5, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 6, "rank_duration": 3, "combined_rank": 9}, {"id": "4396977C-6DD5-4862-9381-2FF7807D7ACD", "date": "2025-07-04", "weekday": "Fri", "start_time": "11:20", "timestamp": "2025-07-04T11:20:59-04:00", "duration_s": 1700.471195101738, "duration_min": 28.34, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 170.0471195101738, "pace_str": "2:50", "avg_hr": 121.1, "max_hr": 153, "kcal": 447.0, "strokes": 490.0, "cadence_spm": 17.3, "swolf": 54.8, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 19, "rank_duration": 27, "combined_rank": 46}, {"id": "26AEA2F4-BAC0-478D-BA94-9F723A84FD16", "date": "2025-07-09", "weekday": "Wed", "start_time": "17:28", "timestamp": "2025-07-09T17:28:09-04:00", "duration_s": 2954.1153349876404, "duration_min": 49.24, "distance_m": 1700.0, "laps": 68, "pace_per_100m_s": 173.7714902933906, "pace_str": "2:54", "avg_hr": 128.4, "max_hr": 146, "kcal": 711.0, "strokes": 814, "cadence_spm": 16.5, "swolf": 55.4, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 4, "rank_duration": 5, "combined_rank": 9}, {"id": "7F3BEC19-B140-483C-8170-23805389E8C8", "date": "2025-07-16", "weekday": "Wed", "start_time": "17:51", "timestamp": "2025-07-16T17:51:35-04:00", "duration_s": 1809.390676021576, "duration_min": 30.16, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 180.9390676021576, "pace_str": "3:01", "avg_hr": 121.6, "max_hr": 137, "kcal": 454.0, "strokes": 532, "cadence_spm": 17.6, "swolf": 58.5, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 20, "rank_duration": 24, "combined_rank": 44}, {"id": "C836DBDC-DDED-4F37-9C3B-8F0B7C9BBF77", "date": "2025-07-29", "weekday": "Tue", "start_time": "17:27", "timestamp": "2025-07-29T17:27:51-04:00", "duration_s": 1106.289065003395, "duration_min": 18.44, "distance_m": 600.0, "laps": 24, "pace_per_100m_s": 184.38151083389917, "pace_str": "3:04", "avg_hr": 122.4, "max_hr": 141, "kcal": 235.0, "strokes": 312, "cadence_spm": 16.9, "swolf": 59.1, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 48, "rank_duration": 49, "combined_rank": 97}, {"id": "A0AC57CA-523E-46B4-B94D-B9C58B522C34", "date": "2025-09-11", "weekday": "Thu", "start_time": "18:37", "timestamp": "2025-09-11T18:37:07-04:00", "duration_s": 1142.7971481084824, "duration_min": 19.05, "distance_m": 650.0, "laps": 26, "pace_per_100m_s": 175.81494586284344, "pace_str": "2:56", "avg_hr": 124.9, "max_hr": 142, "kcal": 230.0, "strokes": 298.0, "cadence_spm": 15.6, "swolf": 55.4, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 43, "rank_duration": 46, "combined_rank": 89}, {"id": "162A2195-38E9-4B39-8D72-0ADA1ED87153", "date": "2025-12-09", "weekday": "Tue", "start_time": "16:48", "timestamp": "2025-12-09T16:48:23-05:00", "duration_s": 1977.4018069505692, "duration_min": 32.96, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 197.74018069505692, "pace_str": "3:18", "avg_hr": 140.4, "max_hr": 162, "kcal": 370.0, "strokes": 520, "cadence_spm": 15.8, "swolf": 62.4, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 21, "rank_duration": 19, "combined_rank": 40}, {"id": "FFF8E83A-A92A-445E-BCD8-14330891E2EC", "date": "2025-12-11", "weekday": "Thu", "start_time": "16:53", "timestamp": "2025-12-11T16:53:44-05:00", "duration_s": 1470.8779859542847, "duration_min": 24.51, "distance_m": 750.0, "laps": 30, "pace_per_100m_s": 196.11706479390463, "pace_str": "3:16", "avg_hr": 147.0, "max_hr": 159, "kcal": 258.0, "strokes": 390.0, "cadence_spm": 15.9, "swolf": 62.0, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 36, "rank_duration": 34, "combined_rank": 70}, {"id": "95020E19-A891-4841-87CF-64B814FB8A6F", "date": "2025-12-23", "weekday": "Tue", "start_time": "16:32", "timestamp": "2025-12-23T16:32:24-05:00", "duration_s": 2197.9847580194473, "duration_min": 36.63, "distance_m": 1225.0, "laps": 49, "pace_per_100m_s": 179.427327185261, "pace_str": "2:59", "avg_hr": 145.9, "max_hr": 165, "kcal": 407.0, "strokes": 594, "cadence_spm": 16.2, "swolf": 57.0, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 12, "rank_duration": 14, "combined_rank": 26}, {"id": "372241B9-8C86-4363-90C0-EB2F79B923A2", "date": "2025-12-29", "weekday": "Mon", "start_time": "12:04", "timestamp": "2025-12-29T12:04:19-05:00", "duration_s": 2224.921550989151, "duration_min": 37.08, "distance_m": 1250.0, "laps": 50, "pace_per_100m_s": 177.99372407913208, "pace_str": "2:58", "avg_hr": 133.5, "max_hr": 159, "kcal": 434.0, "strokes": 631.0, "cadence_spm": 17.0, "swolf": 57.1, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 9, "rank_duration": 12, "combined_rank": 21}, {"id": "9E2245DD-A426-4832-B201-1CCB6E9C8078", "date": "2026-01-06", "weekday": "Tue", "start_time": "16:45", "timestamp": "2026-01-06T16:45:47-05:00", "duration_s": 2308.004149913788, "duration_min": 38.47, "distance_m": 1300.0, "laps": 52, "pace_per_100m_s": 177.53878076259906, "pace_str": "2:58", "avg_hr": 144.4, "max_hr": 169, "kcal": 411.0, "strokes": 588, "cadence_spm": 15.3, "swolf": 55.7, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 8, "rank_duration": 10, "combined_rank": 18}, {"id": "A85EE706-C29E-4353-9F49-4B7C286B81A1", "date": "2026-01-11", "weekday": "Sun", "start_time": "13:59", "timestamp": "2026-01-11T13:59:50-05:00", "duration_s": 1535.87366604805, "duration_min": 25.6, "distance_m": 800.0, "laps": 32, "pace_per_100m_s": 191.98420825600624, "pace_str": "3:12", "avg_hr": 123.3, "max_hr": 138, "kcal": 260.0, "strokes": 374, "cadence_spm": 14.6, "swolf": 59.7, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 32, "rank_duration": 30, "combined_rank": 62}, {"id": "43845D08-8618-447A-9C73-BAC18C678364", "date": "2026-01-13", "weekday": "Tue", "start_time": "17:04", "timestamp": "2026-01-13T17:04:17-05:00", "duration_s": 1800.9727889299393, "duration_min": 30.02, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 180.09727889299393, "pace_str": "3:00", "avg_hr": 151.2, "max_hr": 172, "kcal": 304.0, "strokes": 446, "cadence_spm": 14.9, "swolf": 56.2, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 22, "rank_duration": 25, "combined_rank": 47}, {"id": "4C4B9B27-732F-4603-842B-D50E625DE142", "date": "2026-01-27", "weekday": "Tue", "start_time": "16:56", "timestamp": "2026-01-27T16:56:27-05:00", "duration_s": 1839.9734179973602, "duration_min": 30.67, "distance_m": 875.0, "laps": 35, "pace_per_100m_s": 210.28267634255545, "pace_str": "3:30", "avg_hr": 142.5, "max_hr": 154, "kcal": 310.0, "strokes": 473.0, "cadence_spm": 15.4, "swolf": 66.1, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 25, "rank_duration": 22, "combined_rank": 47}, {"id": "FEF254D0-BCD8-4662-BCB0-CA335DEFAF41", "date": "2026-01-30", "weekday": "Fri", "start_time": "17:43", "timestamp": "2026-01-30T17:43:28-05:00", "duration_s": 1817.8851490020752, "duration_min": 30.3, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 181.78851490020753, "pace_str": "3:02", "avg_hr": 140.5, "max_hr": 155, "kcal": 317.0, "strokes": 478.0, "cadence_spm": 15.8, "swolf": 57.4, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 23, "rank_duration": 23, "combined_rank": 46}, {"id": "D33CB717-D16E-4EAE-9C8A-777E39BB0665", "date": "2026-02-03", "weekday": "Tue", "start_time": "16:57", "timestamp": "2026-02-03T16:57:14-05:00", "duration_s": 2121.4802869558334, "duration_min": 35.36, "distance_m": 1250.0, "laps": 50, "pace_per_100m_s": 169.71842295646667, "pace_str": "2:50", "avg_hr": 142.4, "max_hr": 161, "kcal": 396.0, "strokes": 613.0, "cadence_spm": 17.3, "swolf": 54.7, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 10, "rank_duration": 15, "combined_rank": 25}, {"id": "E892E7AB-E984-4FAE-BC99-26A37F59A784", "date": "2026-02-05", "weekday": "Thu", "start_time": "16:57", "timestamp": "2026-02-05T16:57:53-05:00", "duration_s": 2011.3849380016327, "duration_min": 33.52, "distance_m": 1050.0, "laps": 42, "pace_per_100m_s": 191.56047028586977, "pace_str": "3:12", "avg_hr": 140.9, "max_hr": 155, "kcal": 333.0, "strokes": 438.0, "cadence_spm": 13.1, "swolf": 58.3, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 16, "rank_duration": 17, "combined_rank": 33}, {"id": "1A040C9A-D509-45D5-8B81-CDAB0B109EDA", "date": "2026-02-10", "weekday": "Tue", "start_time": "17:00", "timestamp": "2026-02-10T17:00:08-05:00", "duration_s": 2204.0843609571457, "duration_min": 36.73, "distance_m": 1150.0, "laps": 46, "pace_per_100m_s": 191.65950964844745, "pace_str": "3:12", "avg_hr": 142.0, "max_hr": 161, "kcal": 401.0, "strokes": 541, "cadence_spm": 14.7, "swolf": 59.7, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 13, "rank_duration": 13, "combined_rank": 26}, {"id": "DA4DDEE8-904E-4620-9013-B0C1564928FB", "date": "2026-02-12", "weekday": "Thu", "start_time": "16:51", "timestamp": "2026-02-12T16:51:49-05:00", "duration_s": 2298.1462490558624, "duration_min": 38.3, "distance_m": 1250.0, "laps": 50, "pace_per_100m_s": 183.851699924469, "pace_str": "3:04", "avg_hr": 141.7, "max_hr": 166, "kcal": 430.0, "strokes": 618, "cadence_spm": 16.1, "swolf": 58.3, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 11, "rank_duration": 11, "combined_rank": 22}, {"id": "6FA06F1E-C481-46C6-946B-76BA0CD08B72", "date": "2026-02-19", "weekday": "Thu", "start_time": "16:50", "timestamp": "2026-02-19T16:50:21-05:00", "duration_s": 1170.4710010290146, "duration_min": 19.51, "distance_m": 650.0, "laps": 26, "pace_per_100m_s": 180.07246169677148, "pace_str": "3:00", "avg_hr": 133.4, "max_hr": 154, "kcal": 210.0, "strokes": 316, "cadence_spm": 16.2, "swolf": 57.2, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 44, "rank_duration": 44, "combined_rank": 88}, {"id": "10CC84DE-575B-4FF4-B448-CE0B27E006FE", "date": "2026-02-20", "weekday": "Fri", "start_time": "17:50", "timestamp": "2026-02-20T17:50:02-05:00", "duration_s": 2482.2207069396973, "duration_min": 41.37, "distance_m": 1400.0, "laps": 56, "pace_per_100m_s": 177.30147906712122, "pace_str": "2:57", "avg_hr": 139.1, "max_hr": 150, "kcal": 460.0, "strokes": 606, "cadence_spm": 14.6, "swolf": 55.1, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 7, "rank_duration": 8, "combined_rank": 15}, {"id": "329A927C-B6BE-4C50-AC25-F55AF790D331", "date": "2026-02-24", "weekday": "Tue", "start_time": "16:48", "timestamp": "2026-02-24T16:48:24-05:00", "duration_s": 2823.0811989307404, "duration_min": 47.05, "distance_m": 1675.0, "laps": 67, "pace_per_100m_s": 168.54216113019345, "pace_str": "2:49", "avg_hr": 144.4, "max_hr": 166, "kcal": 579.0, "strokes": 850, "cadence_spm": 18.1, "swolf": 54.8, "effort": "Hard", "indoor": true, "location": "Pool", "rank_distance": 5, "rank_duration": 6, "combined_rank": 11}, {"id": "45F3C7B5-C99D-45D2-8F39-F182063FD9BF", "date": "2026-03-01", "weekday": "Sun", "start_time": "11:50", "timestamp": "2026-03-01T11:50:22-05:00", "duration_s": 1418.740765929222, "duration_min": 23.65, "distance_m": 650.0, "laps": 26, "pace_per_100m_s": 218.26781014295725, "pace_str": "3:38", "avg_hr": 119.6, "max_hr": 150, "kcal": 209.0, "strokes": 322, "cadence_spm": 13.6, "swolf": 67.0, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 45, "rank_duration": 38, "combined_rank": 83}, {"id": "4AD6CC25-D588-4C22-A5D9-208677A159EC", "date": "2026-03-10", "weekday": "Tue", "start_time": "17:48", "timestamp": "2026-03-10T17:48:32-04:00", "duration_s": 1259.6848599910736, "duration_min": 20.99, "distance_m": 675.0, "laps": 27, "pace_per_100m_s": 186.61997925793682, "pace_str": "3:07", "avg_hr": 111.2, "max_hr": 118, "kcal": 213.0, "strokes": 278, "cadence_spm": 13.2, "swolf": 57.0, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 41, "rank_duration": 42, "combined_rank": 83}, {"id": "DAF5492A-BCFA-4A5B-BD36-73DB128D9BA6", "date": "2026-03-23", "weekday": "Mon", "start_time": "17:07", "timestamp": "2026-03-23T17:07:18-04:00", "duration_s": 2984.7518969774246, "duration_min": 49.75, "distance_m": 1750.0, "laps": 70, "pace_per_100m_s": 170.55725125585283, "pace_str": "2:51", "avg_hr": 125.0, "max_hr": 141, "kcal": 561.0, "strokes": 813.0, "cadence_spm": 16.3, "swolf": 54.3, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 3, "rank_duration": 4, "combined_rank": 7}, {"id": "73C78268-BFE8-438F-A7E4-95A5B58A957B", "date": "2026-03-27", "weekday": "Fri", "start_time": "13:41", "timestamp": "2026-03-27T13:41:50-04:00", "duration_s": 3486.6498180627823, "duration_min": 58.11, "distance_m": 1900.0, "laps": 76, "pace_per_100m_s": 183.50788516119906, "pace_str": "3:04", "avg_hr": 121.0, "max_hr": 137, "kcal": 718.0, "strokes": 1043, "cadence_spm": 17.9, "swolf": 59.6, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 2, "rank_duration": 2, "combined_rank": 4}, {"id": "A5B60D2E-F105-4F2F-AA36-CE4C542EE251", "date": "2026-04-04", "weekday": "Sat", "start_time": "10:15", "timestamp": "2026-04-04T10:15:59-04:00", "duration_s": 1491.5869400501251, "duration_min": 24.86, "distance_m": 800.0, "laps": 32, "pace_per_100m_s": 186.44836750626564, "pace_str": "3:06", "avg_hr": 130.2, "max_hr": 155, "kcal": 273.0, "strokes": 368.0, "cadence_spm": 14.8, "swolf": 58.1, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 33, "rank_duration": 32, "combined_rank": 65}, {"id": "0DC23F1C-7BFF-47E1-A17E-CA230C69D89B", "date": "2026-04-08", "weekday": "Wed", "start_time": "14:38", "timestamp": "2026-04-08T14:38:09-04:00", "duration_s": 833.1830580234528, "duration_min": 13.89, "distance_m": 350.0, "laps": 14, "pace_per_100m_s": 238.05230229241508, "pace_str": "3:58", "avg_hr": 123.7, "max_hr": 144, "kcal": 107.0, "strokes": 154, "cadence_spm": 11.1, "swolf": 70.5, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 56, "rank_duration": 56, "combined_rank": 112}, {"id": "3C14992B-C07C-442C-8611-6775E3C4BE80", "date": "2026-04-10", "weekday": "Fri", "start_time": "14:00", "timestamp": "2026-04-10T14:00:26-04:00", "duration_s": 1734.825248003006, "duration_min": 28.91, "distance_m": 1000.0, "laps": 40, "pace_per_100m_s": 173.4825248003006, "pace_str": "2:53", "avg_hr": 133.6, "max_hr": 148, "kcal": 353.0, "strokes": 499, "cadence_spm": 17.3, "swolf": 55.8, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 24, "rank_duration": 26, "combined_rank": 50}, {"id": "6CE9F2DD-8264-4072-93D6-92EC836F87EE", "date": "2026-04-16", "weekday": "Thu", "start_time": "18:25", "timestamp": "2026-04-16T18:25:33-04:00", "duration_s": 1875.4571739435196, "duration_min": 31.26, "distance_m": 1050.0, "laps": 42, "pace_per_100m_s": 178.61496894700187, "pace_str": "2:59", "avg_hr": 136.6, "max_hr": 153, "kcal": 336.0, "strokes": 494.0, "cadence_spm": 15.8, "swolf": 56.4, "effort": "Moderate", "indoor": true, "location": "Pool", "rank_distance": 17, "rank_duration": 21, "combined_rank": 38}, {"id": "APR18-2026-LONG-WEEK1-0001", "date": "2026-04-18", "weekday": "Sat", "start_time": "09:14", "timestamp": "2026-04-18T09:14:45-04:00", "duration_s": 3797.0874940156937, "duration_min": 63.28, "distance_m": 2050.0, "laps": 82, "pace_per_100m_s": 185.2238, "pace_str": "3:05", "avg_hr": 121.0, "max_hr": 152, "kcal": 702.0, "strokes": 1065, "cadence_spm": 16.8, "swolf": 59.3, "effort": "Easy", "indoor": true, "location": "Pool", "rank_distance": 1, "rank_duration": 1, "combined_rank": 2}];
+const TOP5 = new Set(
+  [...SESSIONS.map((s,i)=>({i, score: s.combined_rank}))]
+    .sort((a,b)=>a.score-b.score).slice(0,5).map(x=>x.i)
+);
 
+// Date helper — all dates on the dashboard render as M/D/YYYY.
 function isoToMdy(iso) {
-  var p = String(iso).split('T')[0].split('-');
-  return parseInt(p[1],10) + '/' + parseInt(p[2],10) + '/' + p[0];
+  if (!iso) return '';
+  const head = String(iso).split('T')[0];
+  const parts = head.split('-');
+  if (parts.length !== 3) return iso;
+  return `${parseInt(parts[1],10)}/${parseInt(parts[2],10)}/${parts[0]}`;
 }
-function shortDate(iso) {
-  var p = String(iso).split('-');
-  return parseInt(p[1],10) + '/' + parseInt(p[2],10);
-}
 
-
-var METRICS = {"sessions": {"title": "Sessions", "what": "Total swim workouts logged in Apple Health. Each one is an adaptation opportunity \u2014 the body rebuilds fitter between, not during, sessions.", "optimal": "For your 5,000m goal: 3 structured swims/week (Mon technique \u00b7 Thu recovery \u00b7 Sat long) plus Wed cross-training. Consistency matters far more than any single hero workout.", "today": "63 all-time sessions. Recent 4-week cadence: ~1.5/week \u2014 below target. Protecting the Saturday long swim is the priority; add a third weekly swim back in as fatigue markers allow.", "status": "warn"}, "total_distance": {"title": "Total Distance", "what": "Cumulative metres across every logged swim. Long-term training volume is the single strongest predictor of endurance adaptation.", "optimal": "For a 5,000m target by November: weekly volume of ~5\u20137 km once plan is in full swing (you're at ~3 km/week now). Total base by goal date: roughly 100 km.", "today": "56.3 km over 2,252 lengths of 25m pool. Weekly volume has grown fast recently (800 \u2192 3,225 m in 3 weeks) \u2014 good signal for aerobic base, but monitor load.", "status": "good"}, "total_time": {"title": "Total Time", "what": "Cumulative minutes of swim training. Time-in-water drives stroke economy far more than any drill \u2014 the neural patterning needs hours.", "optimal": "At goal pace (~3:00/100m), 5,000m = ~150 min/session. Training should accumulate ~5\u20138 hours/month at peak to support that.", "today": "29h 44m across 1,784 minutes. April alone: ~4 hours. Trending right direction.", "status": "good"}, "overall_pace": {"title": "Overall Pace", "what": "Average seconds per 100m across every session, rest included. It reflects long-term economy \u2014 stroke length, pacing discipline, drag reduction.", "optimal": "Goal-session pace for 5,000m: around 2:55\u20133:05/100m. That's slow enough to be aerobic, fast enough to finish in under 2h 30m.", "today": "Overall pace 3:10/100m. That's close to goal-session target \u2014 the engine is already there; the challenge is holding it for 85+ more lengths than you do now.", "status": "good"}, "effort_distribution": {"title": "Easy / Moderate / Hard", "what": "Session count by average heart-rate zone. Polarised training theory says most endurance gains come from a lot of easy + a little hard, with relatively little middle-ground \"grey zone\".", "optimal": "For your goal: ~70\u201380% Easy, ~15% Moderate, ~5\u201310% Hard. Easy volume builds mitochondrial density and capillarisation without creating recovery debt.", "today": "Lifetime split: 52% Easy / 29% Mod / 19% Hard. Close to polarised \u2014 but recent weeks have skewed harder. Keep Thursdays genuinely easy (HR <125).", "status": "good"}, "personal_best": {"title": "Personal Best (Single Session)", "what": "Longest continuous distance in one swim. For a 5,000m goal, this is the most important single number on the dashboard.", "optimal": "Grow PB by ~50\u2013100m/week until ~4,000m, then 50m/week to target. Weekly PB attempts aren't required \u2014 every 2\u20133 weeks is ideal for tissue adaptation.", "today": "2,125m on 2026-04-20 \u2014 42.5% of the 5,000m goal. At current growth rate, goal is reachable by mid-November.", "status": "good"}, "progress": {"title": "Progress to Goal", "what": "Personal best as a percentage of the 5,000m target. A linear measure \u2014 50% means you're halfway there in raw distance terms.", "optimal": "From here: ~3% gain per week to hit Nov 13 target date. This accelerates non-linearly \u2014 the jump from 4,500 \u2192 5,000m is harder than 2,000 \u2192 2,500m because of accumulated glycogen depletion and form breakdown.", "today": "42.5% of 5,000m. 2,875m to go. On pace for mid-November completion if load is managed sensibly.", "status": "good"}, "swolf": {"title": "SWOLF", "what": "Swim-golf score: seconds per length + strokes per length. Lower = more efficient. A proxy for stroke economy \u2014 how much distance you get per unit of effort.", "optimal": "For freestyle at your level: SWOLF 55\u201362 is solid. Elite swimmers live in 38\u201345. A stable SWOLF as distance grows is a better sign than a dropping one at short distances.", "today": "Recent swims averaging ~56\u201360. SWOLF is holding steady as long-swim distance grows \u2014 that's the ideal pattern. Stroke isn't degrading under fatigue.", "status": "good"}, "pace_100m": {"title": "Pace /100m", "what": "Time to swim 100m, including any rest within the session. Includes pacing discipline, not just raw speed.", "optimal": "Long-swim target: 2:55\u20133:10 (conversational, HR <135). Threshold sessions: 5\u201310s faster. Easy Thursday: whatever pace keeps HR <125.", "today": "Most recent session 3:10 \u2014 Moderate effort at avg HR 139.0. Within goal-pace window.", "status": "good"}, "avg_hr": {"title": "Average Heart Rate (Session)", "what": "Mean heart rate over the entire swim. Determines training zone: Easy <125, Moderate 125\u2013139, Hard \u2265140. For building the 5,000m engine, most work happens at Easy.", "optimal": "For the Saturday long swim: target avg HR 125\u2013135. Above 140 and you're borrowing from tomorrow's session. Easy days: stay under 125.", "today": "Latest session: 139.0 bpm (Moderate). For a recovery day this was on the high side \u2014 worth an eye on Thursday sessions staying genuinely easy.", "status": "warn"}, "max_hr": {"title": "Max Heart Rate (Session)", "what": "Peak HR reached during the swim. Useful for spotting surges \u2014 if max is 30+ bpm above avg, pacing is erratic, often from sprinting the last length.", "optimal": "Age-predicted HRmax \u2248 183 bpm. For long swims, peak should ideally stay below 160 (87% HRmax). Regular spikes into the 170s suggest inadequate pacing or dehydration.", "today": "Latest max: 164 bpm. Gap to avg (25.0 bpm) is reasonable \u2014 pacing discipline is holding.", "status": "good"}, "strokes": {"title": "Total Strokes", "what": "Arm pulls counted by the Watch for the whole session. Lower strokes-per-length for a given distance = better reach and glide.", "optimal": "For your stroke style: ~12\u201314 strokes per 25m length at easy pace. Worry only if this climbs notably within a session (fatigue indicator) or drops sharply (probably miscount).", "today": "Latest: 566 strokes over 44 lengths \u2014 12.9 per length. In target range.", "status": "good"}, "cadence": {"title": "Cadence (Stroke Rate)", "what": "Strokes per minute. Distance swimmers typically pull at 14\u201320 spm \u2014 lower cadence + longer stroke = better economy. Pool swimmers sit lower than open-water athletes.", "optimal": "For your endurance goal: 15\u201318 spm in long swims. Higher (20+) is sprint territory and unsustainable past 1,500m.", "today": "Latest: 16.3 spm. Bang-on for long aerobic work.", "status": "good"}, "laps": {"title": "Laps (25m lengths)", "what": "Number of 25m pool lengths in the session. 5,000m goal = 200 lengths. A useful psychological counting unit \u2014 think in 25s, not 5,000s.", "optimal": "Work up in blocks: 40 \u2192 60 \u2192 80 \u2192 100 \u2192 140 \u2192 170 \u2192 200. You're at 85 lengths (PB). Roughly halfway.", "today": "Latest: 44 lengths. PB: 85 lengths.", "status": "good"}, "hrv": {"title": "Heart Rate Variability (HRV)", "what": "Beat-to-beat timing variability measured overnight (SDNN, milliseconds). Higher = stronger parasympathetic tone = better recovery. It's the single best autonomic indicator of how your body is handling accumulated training and life stress.", "optimal": "Your personal baseline (90-day mean): 28.4 ms. Anything in 25\u201340 ms is healthy for you. Below 20 ms = suppressed, indicates fatigue. The trend (vs your own baseline) matters more than the absolute number \u2014 comparing yourself to other people is noise.", "today": "Today: 43.8 ms. 7-day avg: 31.1 ms \u2014 above your baseline. Autonomic recovery is holding.", "status": "good"}, "rhr": {"title": "Resting Heart Rate (RHR)", "what": "Lowest HR detected while at rest (usually overnight). Chronic downward drift = fitness improving. Upward drift over 3\u20135 days = early warning for fatigue, under-recovery, illness, or dehydration.", "optimal": "Your baseline: 69.6 bpm (90-day avg). Aim for stability week-to-week. A 5+ bpm rise sustained over several days is the flag \u2014 not any single measurement.", "today": "Today: 71 bpm. 7-day avg: 68.4 bpm. Stable.", "status": "good"}, "vo2max": {"title": "VO\u2082 Max", "what": "Maximal oxygen uptake (mL/kg/min) \u2014 the ceiling on your cardiovascular engine. Apple estimates this from outdoor walking/running HR-vs-pace data, not from swimming, so it reflects your general aerobic base, not swim-specific fitness.", "optimal": "Age-group average for a trained 37-year-old male: 38\u201345 mL/kg/min. You're already in that band. Annual gain with structured training: 5\u201315%. Protecting against the normal ~1% annual age-related decline is itself a win.", "today": "39.09 mL/kg/min \u2014 up 3.57 from 35.52 six months ago. That's a ~10% gain and above population norms. Oxygen transport is genuinely improving.", "status": "good"}, "acwr": {"title": "ACWR (Acute : Chronic Workload Ratio)", "what": "Last 7 days of training load \u00f7 rolling 28-day average. Gabbett's 2016 research (British Journal of Sports Medicine) established this as the strongest predictor of overuse injury in endurance athletes. It answers: \"is my recent load something my tissues have already adapted to, or a sudden spike?\"", "optimal": "0.8\u20131.3 is the sweet spot \u2014 load is progressing in balance with chronic fitness. >1.5 is documented injury-risk territory. <0.8 = detraining. This matters more for you than most athletes because of the L4-L5 fusion \u2014 spinal tissues adapt slowly and can't absorb abrupt spikes.", "today": "ACWR is 1.8 \u2014 INJURY-RISK ZONE. Weekly volume jumped 4x over 3 weeks. Hold this week as written; next week consider micro-deload if fatigue stays elevated.", "status": "risk"}, "tsb": {"title": "TSB (Training Stress Balance / \"Form\")", "what": "CTL minus ATL. Represents the balance between chronic fitness and acute fatigue \u2014 colloquially called \"form\". Positive = fresh and rested. Deeply negative = carrying significant fatigue.", "optimal": "Target zones: +5 to +25 = race-ready (schedule PB attempts here). \u221210 to +5 = productive training (the normal zone). \u221230 or worse = deeply fatigued, PB attempts are physiologically inadvisable.", "today": "TSB is -73.5. You're deeply fatigued on paper \u2014 not the week for a PB push. Next deload week (Week 4) will bring this back up.", "status": "risk"}, "atl": {"title": "ATL (Acute Training Load)", "what": "7-day exponentially-weighted moving average of daily training impulse (TRIMP). Represents your \"fatigue\" \u2014 the short-term training stress your body is currently processing.", "optimal": "Should be close to CTL most of the time (producing ACWR ~1.0). Can temporarily rise above CTL in build weeks, but returning to baseline each deload is essential.", "today": "ATL is 164.9 vs CTL 91.4 \u2014 short-term load is well above long-term fitness, which is why ACWR is elevated.", "status": "warn"}, "ctl": {"title": "CTL (Chronic Training Load)", "what": "42-day exponentially-weighted moving average of daily TRIMP. Represents \"fitness\" \u2014 the training load your body has adapted to handle. CTL builds slowly and is lost slowly.", "optimal": "Grow CTL by 3\u20135 points/week during build phases. You can't rush this \u2014 the adaptation timeline is set by biology, not motivation.", "today": "CTL is 91.4 and rising. The chronic engine is genuinely growing.", "status": "good"}, "trimp": {"title": "Daily TRIMP (Training Impulse)", "what": "Per-session training load: duration \u00d7 HR intensity \u00d7 Banister weighting. Converts a swim into a single number that rolls up into ATL/CTL. Banister's 1975 framework is still the backbone of every modern training-load model.", "optimal": "Typical session TRIMP for you: 50\u2013100 (easy/moderate swim) up to 150+ (long swim or threshold session). Single sessions aren't the concern \u2014 weekly cumulative load is.", "today": "Recent 7-day cumulative TRIMP drives your ATL of 164.9. Individual session loads available in the sessions table.", "status": "neutral"}, "walking_hr": {"title": "Walking Heart Rate (Average)", "what": "Average HR during regular walking as detected by the Watch. A pure cardiovascular fitness marker \u2014 lower = more efficient heart. Unlike workout HR, it isn't affected by pacing decisions.", "optimal": "90\u2013100 bpm is typical for trained adults. A sustained drop of 3\u20135 bpm over months = meaningful fitness gain.", "today": "Most recent week: 94.0 bpm. Hovering around 93\u201396 \u2014 stable. No red flags.", "status": "good"}, "spo2": {"title": "Blood Oxygen (SpO\u2082)", "what": "Percentage of oxygen-saturated haemoglobin in arterial blood. Should stay above 95% at rest. Altitude, poor sleep, respiratory infections all push it down.", "optimal": "95\u2013100%. Single readings below 93% are usually Watch sensor artefacts (bad fit, motion). Sustained low readings warrant a clinician.", "today": "Today: 98.5%. 30-day average: 97%. Single 93% reading on 4/14 was isolated \u2014 no pattern.", "status": "good"}, "aerobic_efficiency": {"title": "Swim Aerobic Efficiency", "what": "Distance covered \u00f7 (average HR \u00d7 duration in minutes). Expresses \"metres per HR-beat-minute\". Rising over time = your heart is doing less work per metre \u2014 the core physiological adaptation for endurance.", "optimal": "The absolute number is less important than the trend. A slowly-rising line across months is the goal. Session-to-session variability is normal.", "today": "Recent sessions trending upward compared to 6 months ago \u2014 consistent with the VO\u2082 max gain. The aerobic engine is genuinely adapting.", "status": "good"}};
-
-function openMetric(key) {
-  var m = METRICS[key];
-  if (!m) return;
-  document.getElementById('mTitle').textContent = m.title;
-  var statusEl = document.getElementById('mStatus');
-  statusEl.textContent = m.status === 'good' ? 'On track' : m.status === 'warn' ? 'Watch' : m.status === 'risk' ? 'Flag' : 'Info';
-  statusEl.className = 'm-status ' + m.status;
-  document.getElementById('mWhat').innerHTML = m.what;
-  document.getElementById('mOptimal').innerHTML = m.optimal;
-  document.getElementById('mToday').innerHTML = m.today;
-  document.getElementById('mOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeMetric() {
-  document.getElementById('mOverlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeMetric(); });
-
-/* ═══════════════ TABS ═══════════════ */
-document.querySelectorAll('.tab').forEach(function(t){
-  t.addEventListener('click', function(){
-    document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('active'); });
-    document.querySelectorAll('.tab-content').forEach(function(x){ x.classList.remove('active'); });
-    t.classList.add('active');
-    document.getElementById('tab-' + t.dataset.tab).classList.add('active');
-  });
-});
-
-var labels = SESSIONS.map(function(s){ return isoToMdy(s.date); });
-var baseOpts = {
-  plugins: { legend: { labels: { color: '#334155' } }, tooltip: { mode: 'index', intersect: false } },
+// Chart x-axis labels in M/D/YYYY format (from ISO YYYY-MM-DD).
+const labels = SESSIONS.map(s => isoToMdy(s.date));
+const ctxOpts = {
+  plugins: {
+    legend: { labels: { color: '#334155' } },
+    tooltip: { mode: 'index', intersect: false }
+  },
   scales: {
-    x: { ticks: { color: '#64748b', maxRotation: 60, minRotation: 45, autoSkip: true, maxTicksLimit: 14 }, grid: { color: 'rgba(15,23,42,.06)' } },
-    y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(15,23,42,.08)' } }
+    x: { ticks: { color: '#64748b', maxRotation: 60, minRotation: 45, autoSkip: true, maxTicksLimit: 14 }, grid: { color: 'rgba(15,23,42,0.06)' } },
+    y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(15,23,42,0.08)' } }
   }
 };
 
-/* ═══════════════ SWIM CHARTS ═══════════════ */
-var GOAL_M = 5000;
+// Distance + Duration
+const GOAL_M = 5000;
 new Chart(document.getElementById('chartDistDur'), {
-  data: { labels: labels, datasets: [
-    { type:'bar', label:'Distance (m)', data: SESSIONS.map(function(s){return s.distance_m;}), backgroundColor:'rgba(79,195,247,.7)', yAxisID:'y' },
-    { type:'line', label:'Duration (min)', data: SESSIONS.map(function(s){return s.duration_min;}), borderColor:'#ff8a65', backgroundColor:'#ff8a65', yAxisID:'y1', tension:.25, pointRadius:2 },
-    { type:'line', label:'Goal (5,000 m)', data: SESSIONS.map(function(){return GOAL_M;}), borderColor:'rgba(76,175,80,.9)', borderDash:[6,4], borderWidth:2, pointRadius:0, yAxisID:'y', fill:false }
-  ] },
-  options: { plugins: baseOpts.plugins, scales: {
-    x: baseOpts.scales.x,
-    y: { position:'left', ticks:{color:'#9aa4b8'}, grid:{color:'rgba(255,255,255,.06)'}, title:{display:true,text:'Distance (m)',color:'#9aa4b8'}, suggestedMax: GOAL_M * 1.05 },
-    y1: { position:'right', ticks:{color:'#9aa4b8'}, grid:{drawOnChartArea:false}, title:{display:true,text:'Duration (min)',color:'#9aa4b8'} }
-  } }
-});
-
-new Chart(document.getElementById('chartPace'), {
-  type: 'line',
-  data: { labels: labels, datasets: [{ label:'Pace (sec/100m)', data: SESSIONS.map(function(s){return s.pace_per_100m_s;}), borderColor:'#4fc3f7', backgroundColor:'rgba(79,195,247,.15)', tension:.25, fill:true, pointRadius:2 }] },
-  options: { plugins: baseOpts.plugins, scales: {
-    x: baseOpts.scales.x,
-    y: { reverse:true, ticks:{ color:'#9aa4b8', callback: function(v){ var m=Math.floor(v/60),s=Math.round(v-m*60); return m+':'+String(s).padStart(2,'0'); } }, grid:{color:'rgba(255,255,255,.06)'} }
-  } }
-});
-
-new Chart(document.getElementById('chartHR'), {
-  type:'line',
-  data:{ labels: labels, datasets: [
-    { label:'Avg HR', data: SESSIONS.map(function(s){return s.avg_hr;}), borderColor:'#ffb300', backgroundColor:'rgba(255,179,0,.15)', tension:.25, pointRadius:2 },
-    { label:'Max HR', data: SESSIONS.map(function(s){return s.max_hr;}), borderColor:'#e53935', backgroundColor:'rgba(229,57,53,.12)', tension:.25, pointRadius:2 }
-  ] },
-  options: baseOpts
-});
-
-new Chart(document.getElementById('chartLaps'), {
-  type:'bar',
-  data:{ labels: labels, datasets: [{ label:'Laps (25m)', data: SESSIONS.map(function(s){return s.laps;}), backgroundColor:'rgba(129,199,132,.7)' }] },
-  options: baseOpts
-});
-
-new Chart(document.getElementById('chartEffort'), {
-  type:'doughnut',
-  data:{ labels: ['Easy','Moderate','Hard'], datasets:[{
-    data:[
-      SESSIONS.filter(function(s){return s.effort==='Easy';}).length,
-      SESSIONS.filter(function(s){return s.effort==='Moderate';}).length,
-      SESSIONS.filter(function(s){return s.effort==='Hard';}).length
-    ],
-    backgroundColor:['#4caf50','#ffb300','#e53935'], borderColor:'#fff'
-  }] },
-  options: { plugins:{legend:{position:'right',labels:{color:'#0f172a',font:{weight:'600'}}}}, cutout:'55%' }
-});
-
-new Chart(document.getElementById('chartSWOLF'), {
-  type:'line',
-  data:{ labels: labels, datasets:[{ label:'SWOLF', data: SESSIONS.map(function(s){return s.swolf;}), borderColor:'#ab47bc', backgroundColor:'rgba(171,71,188,.12)', tension:.25, pointRadius:2 }] },
-  options: baseOpts
-});
-
-/* Table */
-var tbody = document.querySelector('#tbl tbody');
-var effortClass = function(e){ return e==='Easy'?'easy':e==='Moderate'?'mod':e==='Hard'?'hard':'unk'; };
-SESSIONS.forEach(function(s, i){
-  var tr = document.createElement('tr');
-  if (TOP5.has(i)) tr.classList.add('top5');
-  tr.innerHTML = '<td>' + isoToMdy(s.date) + ' <span class="meta">' + s.weekday + '</span></td>'
-    + '<td>' + s.start_time + '</td>'
-    + '<td><span class="badge ' + effortClass(s.effort) + '">' + s.effort + '</span></td>'
-    + '<td>' + Math.round(s.distance_m) + '</td>'
-    + '<td>' + s.laps + '</td>'
-    + '<td>' + s.duration_min.toFixed(1) + '</td>'
-    + '<td>' + s.pace_str + '</td>'
-    + '<td>' + (s.avg_hr != null ? s.avg_hr : '\u2014') + '</td>'
-    + '<td>' + (s.max_hr != null ? s.max_hr : '\u2014') + '</td>'
-    + '<td>' + (s.strokes != null ? s.strokes : '\u2014') + '</td>'
-    + '<td>' + (s.swolf != null ? s.swolf : '\u2014') + '</td>'
-    + '<td>' + (s.kcal != null ? Math.round(s.kcal) : '\u2014') + '</td>';
-  tbody.appendChild(tr);
-});
-
-/* ═══════════════ PHYSIOLOGY CHARTS ═══════════════ */
-var loadLabels = PHYS.load_dates.map(shortDate);
-
-new Chart(document.getElementById('chartLoad'), {
-  data: { labels: loadLabels, datasets: [
-    { type:'bar', label:'Daily load (TRIMP)', data: PHYS.load_daily, backgroundColor:'rgba(148,163,184,.4)', yAxisID:'y' },
-    { type:'line', label:'ATL (fatigue)', data: PHYS.load_atl, borderColor:'#e53935', backgroundColor:'rgba(229,57,53,.1)', tension:.25, pointRadius:0, borderWidth:2, yAxisID:'y' },
-    { type:'line', label:'CTL (fitness)', data: PHYS.load_ctl, borderColor:'#0284c7', backgroundColor:'rgba(2,132,199,.1)', tension:.25, pointRadius:0, borderWidth:2, yAxisID:'y' },
-    { type:'line', label:'TSB (form)', data: PHYS.load_tsb, borderColor:'#4caf50', backgroundColor:'rgba(76,175,80,.1)', tension:.25, pointRadius:0, borderWidth:1, borderDash:[4,3], yAxisID:'y1' }
-  ] },
-  options: { plugins: baseOpts.plugins, scales: {
-    x: baseOpts.scales.x,
-    y: { position:'left', ticks:{color:'#64748b'}, grid:{color:'rgba(15,23,42,.06)'}, title:{display:true,text:'TRIMP',color:'#64748b'} },
-    y1: { position:'right', ticks:{color:'#64748b'}, grid:{drawOnChartArea:false}, title:{display:true,text:'TSB',color:'#64748b'} }
-  } }
-});
-
-/* ACWR chart — with sweet-spot shading */
-var acwr = PHYS.load_atl.map(function(a,i){ var c = PHYS.load_ctl[i]; return c > 0.1 ? Math.round((a/c)*100)/100 : 0; });
-new Chart(document.getElementById('chartACWR'), {
-  type: 'line',
-  data: { labels: loadLabels, datasets: [
-    { label:'ACWR', data: acwr, borderColor:'#7c3aed', backgroundColor:'rgba(124,58,237,.1)', tension:.2, pointRadius:0, borderWidth:2, fill:true },
-    { label:'Sweet spot (1.3)', data: acwr.map(function(){return 1.3;}), borderColor:'rgba(76,175,80,.6)', borderDash:[4,3], pointRadius:0, borderWidth:1, fill:false },
-    { label:'Risk zone (1.5)', data: acwr.map(function(){return 1.5;}), borderColor:'rgba(229,57,53,.6)', borderDash:[4,3], pointRadius:0, borderWidth:1, fill:false }
-  ] },
-  options: { plugins: baseOpts.plugins, scales: {
-    x: baseOpts.scales.x,
-    y: { ticks:{color:'#64748b'}, grid:{color:'rgba(15,23,42,.06)'}, suggestedMin:0, suggestedMax:2.5 }
-  } }
-});
-
-/* Weekly volume */
-new Chart(document.getElementById('chartWeekly'), {
-  type:'bar',
-  data:{
-    labels: PHYS.weekly_vol.map(function(w){ return shortDate(w.week); }),
-    datasets: [{ label:'Weekly metres', data: PHYS.weekly_vol.map(function(w){return w.dist;}),
-                 backgroundColor: PHYS.weekly_vol.map(function(w,i,arr){
-                   if (i === 0) return 'rgba(79,195,247,.7)';
-                   var jump = w.dist / Math.max(1, arr[i-1].dist);
-                   return jump > 1.5 ? 'rgba(229,57,53,.7)' : jump > 1.3 ? 'rgba(255,179,0,.7)' : 'rgba(79,195,247,.7)';
-                 }) }]
-  },
-  options: baseOpts
-});
-
-/* HRV — with baseline band */
-new Chart(document.getElementById('chartHRV'), {
-  type:'line',
-  data:{
-    labels: PHYS.hrv.map(function(x){return shortDate(x[0]);}),
+  data: {
+    labels,
     datasets: [
-      { label:'HRV (ms)', data: PHYS.hrv.map(function(x){return x[1];}), borderColor:'#0284c7', backgroundColor:'rgba(2,132,199,.1)', tension:.25, pointRadius:2, fill:true },
-      { label:'Suppressed (< 20ms)', data: PHYS.hrv.map(function(){return 20;}), borderColor:'rgba(229,57,53,.5)', borderDash:[4,3], pointRadius:0, borderWidth:1, fill:false },
-      { label:'Baseline avg', data: PHYS.hrv.map(function(){return PHYS.hrv_mean;}), borderColor:'rgba(76,175,80,.6)', borderDash:[4,3], pointRadius:0, borderWidth:1, fill:false }
+      { type:'bar', label:'Distance (m)', data: SESSIONS.map(s=>s.distance_m), backgroundColor:'rgba(79,195,247,0.7)', yAxisID:'y' },
+      { type:'line', label:'Duration (min)', data: SESSIONS.map(s=>s.duration_min), borderColor:'#ff8a65', backgroundColor:'#ff8a65', yAxisID:'y1', tension: 0.25, pointRadius: 2 },
+      { type:'line', label:'Goal (5,000 m)', data: SESSIONS.map(()=>GOAL_M), borderColor:'rgba(76,175,80,0.9)', borderDash:[6,4], borderWidth:2, pointRadius:0, yAxisID:'y', fill:false }
     ]
   },
-  options: baseOpts
+  options: {
+    ...ctxOpts,
+    scales: {
+      x: ctxOpts.scales.x,
+      y: { position:'left', ticks:{ color:'#9aa4b8' }, grid:{ color:'rgba(255,255,255,0.06)' }, title:{ display:true, text:'Distance (m)', color:'#9aa4b8' }, suggestedMax: GOAL_M * 1.05 },
+      y1:{ position:'right', ticks:{ color:'#9aa4b8' }, grid:{ drawOnChartArea:false }, title:{ display:true, text:'Duration (min)', color:'#9aa4b8' } }
+    }
+  }
 });
 
-/* RHR */
-new Chart(document.getElementById('chartRHR'), {
-  type:'line',
-  data:{
-    labels: PHYS.rhr.map(function(x){return shortDate(x[0]);}),
-    datasets: [{ label:'RHR (bpm)', data: PHYS.rhr.map(function(x){return x[1];}), borderColor:'#e53935', backgroundColor:'rgba(229,57,53,.1)', tension:.25, pointRadius:2, fill:true }]
+// Pace trend — show seconds per 100m (lower better); reverse the axis for intuition
+new Chart(document.getElementById('chartPace'), {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [{ label:'Pace (sec /100m)', data: SESSIONS.map(s=>s.pace_per_100m_s), borderColor:'#4fc3f7', backgroundColor:'rgba(79,195,247,0.15)', tension:0.25, fill:true, pointRadius:2 }]
   },
-  options: baseOpts
+  options: {
+    ...ctxOpts,
+    scales: {
+      x: ctxOpts.scales.x,
+      y: { reverse:true, ticks:{ color:'#9aa4b8', callback:(v)=>{const m=Math.floor(v/60), s=Math.round(v-m*60); return m+':'+String(s).padStart(2,'0');} }, grid:{ color:'rgba(255,255,255,0.06)' } }
+    }
+  }
 });
 
-/* VO2 Max */
-new Chart(document.getElementById('chartVO2'), {
+// Heart Rate
+new Chart(document.getElementById('chartHR'), {
   type:'line',
-  data:{
-    labels: PHYS.vo2.map(function(x){return shortDate(x[0]);}),
-    datasets: [{ label:'VO\u2082 max (mL/kg/min)', data: PHYS.vo2.map(function(x){return x[1];}), borderColor:'#4caf50', backgroundColor:'rgba(76,175,80,.15)', tension:.25, pointRadius:3, fill:true }]
+  data: {
+    labels,
+    datasets: [
+      { label:'Avg HR', data: SESSIONS.map(s=>s.avg_hr), borderColor:'#ffb300', backgroundColor:'rgba(255,179,0,0.15)', tension:0.25, pointRadius:2 },
+      { label:'Max HR', data: SESSIONS.map(s=>s.max_hr), borderColor:'#e53935', backgroundColor:'rgba(229,57,53,0.12)', tension:0.25, pointRadius:2 }
+    ]
   },
-  options: baseOpts
+  options: ctxOpts
 });
 
-/* Walking HR */
-new Chart(document.getElementById('chartWalkHR'), {
-  type:'line',
-  data:{
-    labels: PHYS.walking_hr.map(function(x){return shortDate(x[0]);}),
-    datasets: [{ label:'Walking HR avg', data: PHYS.walking_hr.map(function(x){return x[1];}), borderColor:'#ff8a65', backgroundColor:'rgba(255,138,101,.15)', tension:.25, pointRadius:3, fill:true }]
+// Laps
+new Chart(document.getElementById('chartLaps'), {
+  type:'bar',
+  data: {
+    labels,
+    datasets: [{ label:'Laps (25m)', data: SESSIONS.map(s=>s.laps), backgroundColor:'rgba(129,199,132,0.7)' }]
   },
-  options: baseOpts
+  options: ctxOpts
 });
 
-/* SpO2 */
-new Chart(document.getElementById('chartSpO2'), {
-  type:'line',
-  data:{
-    labels: PHYS.spo2.map(function(x){return shortDate(x[0]);}),
-    datasets: [{ label:'SpO\u2082 (%)', data: PHYS.spo2.map(function(x){return x[1];}), borderColor:'#0284c7', backgroundColor:'rgba(2,132,199,.1)', tension:.25, pointRadius:2, fill:true }]
+// Effort pie
+new Chart(document.getElementById('chartEffort'), {
+  type:'doughnut',
+  data: {
+    labels: ['Easy','Moderate','Hard'],
+    datasets: [{
+      data: [
+        SESSIONS.filter(s=>s.effort==='Easy').length,
+        SESSIONS.filter(s=>s.effort==='Moderate').length,
+        SESSIONS.filter(s=>s.effort==='Hard').length
+      ],
+      backgroundColor: ['#4caf50','#ffb300','#e53935'],
+      borderColor: '#ffffff'
+    }]
   },
-  options: { plugins: baseOpts.plugins, scales: {
-    x: baseOpts.scales.x,
-    y: { ticks:{color:'#64748b'}, grid:{color:'rgba(15,23,42,.06)'}, suggestedMin:90, suggestedMax:100 }
-  } }
+  options: {
+    plugins: { legend: { labels: { color:'#0f172a', font: { weight: '600' } }, position: 'right' } },
+    cutout: '55%'
+  }
 });
 
-/* Aerobic efficiency per swim */
-var effSessions = SESSIONS.filter(function(s){ return s.aerobic_eff != null; });
-new Chart(document.getElementById('chartAeroEff'), {
+// SWOLF
+new Chart(document.getElementById('chartSWOLF'), {
   type:'line',
-  data:{
-    labels: effSessions.map(function(s){return isoToMdy(s.date);}),
-    datasets: [{ label:'Distance / (HR \u00D7 min)', data: effSessions.map(function(s){return s.aerobic_eff;}), borderColor:'#7c3aed', backgroundColor:'rgba(124,58,237,.12)', tension:.25, pointRadius:2, fill:true }]
+  data: {
+    labels,
+    datasets: [{ label:'SWOLF', data: SESSIONS.map(s=>s.swolf), borderColor:'#ab47bc', backgroundColor:'rgba(171,71,188,0.12)', tension:0.25, pointRadius:2 }]
   },
-  options: baseOpts
+  options: ctxOpts
+});
+
+// Action Plan — embedded plan data (computed server-side from latest data)
+const ACTION_PLAN = {"generated_at": "4/18/2026", "target_m": 5000, "max_weeks": 29, "default_swim_days": ["Tue", "Wed", "Thu", "Sat"], "current": {"recent_long_swim_m": 2050, "all_time_pb_m": 2050.0, "pct_of_goal": 41.0, "freq_per_week_last_4w": 1.5, "freq_per_week_last_8w": 1.25, "recent_pace_per_100m_s": 185.2, "recent_pace_str": "3:05", "avg_hr_last_14d": 131.0, "avg_hr_prior_14d": 123.0, "fatigue_flag": true}, "trend": {"weekly_slope_m_per_week": -8.2, "weeks_to_target_at_trend": 124, "required_weekly_growth_pct": 3.39}, "projection": {"plan_weekly_growth_pct": 3.39, "weeks_to_target_at_plan_rate": 30, "projected_date": "2026-11-13"}, "insights": ["You're at 41.0% of the 5,000 m goal. New personal best: 2,050 m (4/18/2026).", "Today's session held pace at 3:05/100m with stable stroke count across all 82 lengths \u2014 form is holding under longer distances.", "Frequency target: 3 of Mon/Wed/Thu/Sat per week. Saturday gets the Long day when available.", "Recent pace: ~3:05/100m (today's actual). Within the 3:05\u20133:10 target window for conversational effort.", "Avg HR today: 121 bpm (Easy zone). Effort was well-managed for distance building.", "Progress toward 5,000m: 2950 m to go. At current growth rate, projected date holds around November 2026."], "weekly_plan": [{"week_num": 1, "week_label": "Week 1 \u00b7 4/13/2026", "long_swim_m": 1950, "deload": false, "note": null, "four_day": {"Tue (Technique)": "Warm 200m \u2192 8\u00d750m drills (catch-up/fist) \u2192 4\u00d7100m easy; 1072m total", "Wed (Threshold)": "Warm 200m \u2192 8\u00d7100m @ threshold (~5-10s faster than easy pace) on 2:00 \u2192 cool 200m; ~1072m", "Thu (Recovery)": "Easy continuous 877m focus on bilateral breathing & long strokes", "Sat (LONG SWIM)": "1950m continuous \u2014 the PB-builder. Target pace = easy+steady."}, "three_day": {"Tue (Mixed)": "Warm 200m \u2192 6\u00d7100m descending + 4\u00d750m drills \u2192 975m total", "Thu (Threshold)": "Warm 200m \u2192 6\u00d7150m @ threshold on 2:45 \u2192 cool 200m; ~1072m", "Sat (LONG SWIM)": "1950m continuous"}}, {"week_num": 2, "week_label": "Week 2 \u00b7 4/20/2026", "long_swim_m": 2000, "deload": false, "note": null, "four_day": {"Tue (Technique)": "Warm 200m \u2192 8\u00d750m drills (catch-up/fist) \u2192 4\u00d7100m easy; 1100m total", "Wed (Threshold)": "Warm 200m \u2192 8\u00d7100m @ threshold (~5-10s faster than easy pace) on 2:00 \u2192 cool 200m; ~1100m", "Thu (Recovery)": "Easy continuous 900m focus on bilateral breathing & long strokes", "Sat (LONG SWIM)": "2000m continuous \u2014 the PB-builder. Target pace = easy+steady."}, "three_day": {"Tue (Mixed)": "Warm 200m \u2192 6\u00d7100m descending + 4\u00d750m drills \u2192 1000m total", "Thu (Threshold)": "Warm 200m \u2192 6\u00d7150m @ threshold on 2:45 \u2192 cool 200m; ~1100m", "Sat (LONG SWIM)": "2000m continuous"}}, {"week_num": 3, "week_label": "Week 3 \u00b7 4/27/2026", "long_swim_m": 2050, "deload": false, "note": null, "four_day": {"Tue (Technique)": "Warm 200m \u2192 8\u00d750m drills (catch-up/fist) \u2192 4\u00d7100m easy; 1127m total", "Wed (Threshold)": "Warm 200m \u2192 8\u00d7100m @ threshold (~5-10s faster than easy pace) on 2:00 \u2192 cool 200m; ~1127m", "Thu (Recovery)": "Easy continuous 922m focus on bilateral breathing & long strokes", "Sat (LONG SWIM)": "2050m continuous \u2014 the PB-builder. Target pace = easy+steady."}, "three_day": {"Tue (Mixed)": "Warm 200m \u2192 6\u00d7100m descending + 4\u00d750m drills \u2192 1025m total", "Thu (Threshold)": "Warm 200m \u2192 6\u00d7150m @ threshold on 2:45 \u2192 cool 200m; ~1127m", "Sat (LONG SWIM)": "2050m continuous"}}, {"week_num": 4, "week_label": "Week 4 \u00b7 5/4/2026", "long_swim_m": 1750, "deload": true, "note": "Deload week \u2014 cut volume ~15%, focus on form & feel.", "four_day": {"Tue (Technique)": "Warm 200m \u2192 8\u00d750m drills (catch-up/fist) \u2192 4\u00d7100m easy; 962m total", "Wed (Threshold)": "Warm 200m \u2192 8\u00d7100m @ threshold (~5-10s faster than easy pace) on 2:00 \u2192 cool 200m; ~962m", "Thu (Recovery)": "Easy continuous 787m focus on bilateral breathing & long strokes", "Sat (LONG SWIM)": "1750m continuous \u2014 the PB-builder. Target pace = easy+steady."}, "three_day": {"Tue (Mixed)": "Warm 200m \u2192 6\u00d7100m descending + 4\u00d750m drills \u2192 875m total", "Thu (Threshold)": "Warm 200m \u2192 6\u00d7150m @ threshold on 2:45 \u2192 cool 200m; ~962m", "Sat (LONG SWIM)": "1750m continuous"}}, {"week_num": 5, "week_label": "Week 5 \u00b7 5/11/2026", "long_swim_m": 2100, "deload": false, "note": null, "four_day": {"Tue (Technique)": "Warm 200m \u2192 8\u00d750m drills (catch-up/fist) \u2192 4\u00d7100m easy; 1155m total", "Wed (Threshold)": "Warm 200m \u2192 8\u00d7100m @ threshold (~5-10s faster than easy pace) on 2:00 \u2192 cool 200m; ~1155m", "Thu (Recovery)": "Easy continuous 945m focus on bilateral breathing & long strokes", "Sat (LONG SWIM)": "2100m continuous \u2014 the PB-builder. Target pace = easy+steady."}, "three_day": {"Tue (Mixed)": "Warm 200m \u2192 6\u00d7100m descending + 4\u00d750m drills \u2192 1050m total", "Thu (Threshold)": "Warm 200m \u2192 6\u00d7150m @ threshold on 2:45 \u2192 cool 200m; ~1155m", "Sat (LONG SWIM)": "2100m continuous"}}, {"week_num": 6, "week_label": "Week 6 \u00b7 5/18/2026", "long_swim_m": 2150, "deload": false, "note": null, "four_day": {"Tue (Technique)": "Warm 200m \u2192 8\u00d750m drills (catch-up/fist) \u2192 4\u00d7100m easy; 1182m total", "Wed (Threshold)": "Warm 200m \u2192 8\u00d7100m @ threshold (~5-10s faster than easy pace) on 2:00 \u2192 cool 200m; ~1182m", "Thu (Recovery)": "Easy continuous 967m focus on bilateral breathing & long strokes", "Sat (LONG SWIM)": "2150m continuous \u2014 the PB-builder. Target pace = easy+steady."}, "three_day": {"Tue (Mixed)": "Warm 200m \u2192 6\u00d7100m descending + 4\u00d750m drills \u2192 1075m total", "Thu (Threshold)": "Warm 200m \u2192 6\u00d7150m @ threshold on 2:45 \u2192 cool 200m; ~1182m", "Sat (LONG SWIM)": "2150m continuous"}}], "adaptation_rules": ["If last long swim felt hard or HR rose \u22655 bpm vs the prior one \u2192 repeat the same distance next week instead of adding.", "If you only swim 3 days in a given week \u2192 use the 3-day template; don't try to cram the 4-day one.", "Every 4th week is a deload (~\u221215% long swim, technique focus). Don't skip it \u2014 this is where adaptation locks in.", "If you hit the week's long swim for 2 consecutive weeks with steady HR \u2192 the next week can push +8% instead of the default ~4%.", "If you feel shoulder discomfort, swap a quality day (Wed) for pure drills/kick \u2014 never train through pain."]};
+
+function openActionPlan() {
+  renderActionPlan();
+  document.getElementById('apOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeActionPlan() {
+  document.getElementById('apOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeActionPlan();
+});
+
+let apMode = '4day'; // or '3day'
+function setApMode(mode) {
+  apMode = mode;
+  document.querySelectorAll('.ap-toggle button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  renderActionPlanWeeks();
+}
+
+function renderActionPlan() {
+  const p = ACTION_PLAN;
+  const c = p.current;
+  const t = p.trend;
+  const proj = p.projection;
+
+  // Stats
+  const stats = document.getElementById('apStats');
+  const projDate = proj.projected_date ? isoToMdy(proj.projected_date) : 'N/A';
+  stats.innerHTML = `
+    <div class="ap-stat"><div class="k">Recent Long Swim</div><div class="v">${c.recent_long_swim_m.toLocaleString()} m</div><div class="s">${c.pct_of_goal}% of 5,000 m</div></div>
+    <div class="ap-stat"><div class="k">Frequency (4w / 8w)</div><div class="v">${c.freq_per_week_last_4w} / ${c.freq_per_week_last_8w}</div><div class="s">sessions per week</div></div>
+    <div class="ap-stat"><div class="k">Recent Pace</div><div class="v">${c.recent_pace_str}</div><div class="s">per 100m · incl. rest</div></div>
+    <div class="ap-stat"><div class="k">Trend</div><div class="v">+${t.weekly_slope_m_per_week} m/wk</div><div class="s">observed last ~12 wks</div></div>
+    <div class="ap-stat"><div class="k">Projected Goal Date</div><div class="v">${projDate}</div><div class="s">${proj.weeks_to_target_at_plan_rate ?? '—'} weeks at plan rate (${proj.plan_weekly_growth_pct}%/wk)</div></div>
+    <div class="ap-stat"><div class="k">Fatigue Check</div><div class="v">${c.avg_hr_last_14d ?? '—'} bpm</div><div class="s">vs ${c.avg_hr_prior_14d ?? '—'} prior 2w${c.fatigue_flag ? ' · ⚠️ elevated' : ''}</div></div>
+  `;
+
+  // Insights
+  const ins = document.getElementById('apInsights');
+  ins.innerHTML = p.insights.map(i => `<li>${i}</li>`).join('');
+
+  // Rules
+  const rules = document.getElementById('apRules');
+  rules.innerHTML = p.adaptation_rules.map(r => `<li>${r}</li>`).join('');
+
+  // Weeks
+  renderActionPlanWeeks();
+}
+
+// Save the action plan as a standalone HTML file (client-side download).
+function savePlanHTML() {
+  const modal = document.querySelector('.ap-modal').cloneNode(true);
+  // Strip interactive bits
+  modal.querySelectorAll('.ap-actions, .ap-close, .ap-toggle').forEach(n => n.remove());
+  // Show only the 4-day plan by default in the standalone file
+  const todayIso = new Date().toISOString().slice(0,10);
+  const today = isoToMdy(todayIso);
+  const doc = `<!doctype html><html><head><meta charset="utf-8">
+<title>Swim Action Plan — ${today}</title>
+<style>
+  body{font-family:-apple-system,Segoe UI,Arial,sans-serif;margin:28px;color:#1a1a1a;background:#fff;max-width:900px;}
+  h2{font-size:20px;margin:0 0 4px}
+  h3{font-size:12px;text-transform:uppercase;color:#1976d2;letter-spacing:1px;margin:16px 0 6px}
+  .ap-sub{color:#5a6578;font-size:13px;margin-bottom:10px}
+  .ap-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+  .ap-stat{border:1px solid #cfd6e6;border-radius:8px;padding:10px 12px}
+  .ap-stat .k{font-size:11px;color:#5a6578;text-transform:uppercase;letter-spacing:1px}
+  .ap-stat .v{font-size:18px;font-weight:600;margin-top:2px}
+  .ap-stat .s{font-size:11px;color:#5a6578;margin-top:2px}
+  .ap-week{border:1px solid #cfd6e6;border-radius:8px;padding:10px 12px;margin:8px 0}
+  .ap-week.deload{border-color:#b26a00}
+  .ap-week-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:6px}
+  .ap-week-title{font-weight:700}
+  .ap-week-long b{color:#1976d2}
+  .ap-day{font-size:12.5px;padding:4px 8px;margin-top:4px;border-left:3px solid #cfd6e6;background:#f5f7fb;border-radius:4px}
+  .ap-day.long{border-left-color:#1976d2;background:#e3f2fd}
+  .ap-deload-tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;background:#fff4d6;color:#b26a00;padding:2px 6px;border-radius:4px}
+  ul{padding-left:18px} li{margin:4px 0;font-size:13px}
+</style></head>
+
+<body>${modal.innerHTML}<hr style="margin-top:24px;border:none;border-top:1px solid #cfd6e6">
+<p style="font-size:11px;color:#5a6578">Generated from Swim Dashboard on ${today}. This plan is regenerated daily from your Apple Watch data.</p>
+</body></html>`;
+  const blob = new Blob([doc], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Swim_Action_Plan_${todayIso}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function renderActionPlanWeeks() {
+const wrap = document.getElementById(‘apWeeks’);
+const plan = apMode === ‘3day’ ? ‘three_day’ : ‘four_day’;
+wrap.innerHTML = ACTION_PLAN.weekly_plan.map(w => {
+const days = Object.entries(w[plan]).map(([name, desc]) => {
+const isLong = name.toUpperCase().includes(‘LONG’);
+return `<div class="ap-day${isLong ? ' long' : ''}"><b>${name}:</b> ${desc}</div>`;
+}).join(’’);
+return `<div class="ap-week${w.deload ? ' deload' : ''}"> <div class="ap-week-head"> <div class="ap-week-title">${w.week_label} ${w.deload ? '<span class="ap-deload-tag">Deload</span>' : ''}</div> <div class="ap-week-long">Long swim: <b>${w.long_swim_m.toLocaleString()} m</b></div> </div> ${w.note ?`<div class="ap-sub" style="margin:6px 0 0">${w.note}</div>`: ''} <div class="ap-days">${days}</div> </div>`;
+}).join(’’);
+}
+
+// Table
+const tbody = document.querySelector(’#tbl tbody’);
+const effortClass = e => e===‘Easy’?‘easy’:e===‘Moderate’?‘mod’:e===‘Hard’?‘hard’:‘unk’;
+SESSIONS.forEach((s,i) => {
+const tr = document.createElement(‘tr’);
+if (TOP5.has(i)) tr.classList.add(‘top5’);
+tr.innerHTML = `<td>${isoToMdy(s.date)} <span class="meta">${s.weekday}</span></td> <td>${s.start_time}</td> <td><span class="badge ${effortClass(s.effort)}">${s.effort}</span></td> <td>${Math.round(s.distance_m)}</td> <td>${s.laps}</td> <td>${s.duration_min.toFixed(1)}</td> <td>${s.pace_str}</td> <td>${s.avg_hr ?? '—'}</td> <td>${s.max_hr ?? '—'}</td> <td>${s.strokes ?? '—'}</td> <td>${s.swolf ?? '—'}</td> <td>${s.kcal ?? '—'}</td>`;
+tbody.appendChild(tr);
 });
 </script>
 
+<!-- Action Plan overlay -->
+
+<div class="ap-overlay" id="apOverlay" onclick="if(event.target===this) closeActionPlan()">
+  <div class="ap-modal" role="dialog" aria-modal="true" aria-label="Action Plan">
+    <div class="ap-head">
+      <div>
+        <h2>Your Path to 5,000 m</h2>
+        <div class="ap-sub">Adaptive plan generated from your swim history · max 29 weeks · priority: volume → pace</div>
+      </div>
+      <div class="ap-actions">
+        <a class="ap-btn-ghost" href="Swim_Action_Plan.pdf" target="_blank" download="Swim_Action_Plan.pdf" title="Open or download the PDF version">⬇ Save PDF</a>
+        <button class="ap-btn-ghost" onclick="savePlanHTML()" title="Download a standalone HTML copy of this plan">⬇ Save HTML</button>
+        <button class="ap-btn-ghost" onclick="window.print()" title="Use your browser's print dialog — choose 'Save as PDF' to keep a copy">🖨 Print</button>
+        <button class="ap-close" onclick="closeActionPlan()">Close ✕</button>
+      </div>
+    </div>
+
+```
+<div class="ap-section">
+  <h3>Where You Are Now</h3>
+  <div class="ap-stats" id="apStats"></div>
+</div>
+
+<div class="ap-section">
+  <h3>Analysis &amp; Projection</h3>
+  <ul class="ap-insights" id="apInsights"></ul>
+</div>
+
+<div class="ap-section">
+  <h3>Next 6 Weeks</h3>
+  <div class="ap-toggle" role="tablist">
+    <button class="active" data-mode="4day" onclick="setApMode('4day')">4-day week (Tue/Wed/Thu/Sat)</button>
+    <button data-mode="3day" onclick="setApMode('3day')">3-day fallback (Tue/Thu/Sat)</button>
+  </div>
+  <div id="apWeeks"></div>
+</div>
+
+<div class="ap-section">
+  <h3>How the Plan Adapts</h3>
+  <ul class="ap-rules" id="apRules"></ul>
+</div>
+```
+
+  </div>
+</div>
+
 </body>
-</html>
+  </html>
